@@ -106,8 +106,9 @@ void next_token() {
        }
       } else if (position_ident > 1) {
         int j = 0;
-        while (j <= position_ident) {
-          char tmp = identifier[j + 2];
+        char tmp;
+        while (j < position_ident) {
+          tmp = identifier[j + 2];
           identifier[j + 2] = '\0';
           if ((i = search_operator((&identifier[j]))) != -1) {
             j = j + 2;
@@ -127,6 +128,9 @@ void next_token() {
             fprintf(stdout, "[op : %s]\n", operator_list[i]);
             continue;
           }
+          sprintf(error_msg, "Unknown operator: %s", identifier);
+          lexer_msg(error_msg);
+          type = EOF_T;
         }
       }
     /*Search in Operators*/
