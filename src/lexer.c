@@ -1,6 +1,6 @@
 #include "../include/compile.h"
 
-extern char operator_list[operator_size];
+extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
 static char ch = ' ';
 
@@ -20,11 +20,11 @@ int is_char() {
   } else return 0;
 }
 
-int search_operator() {
+int search_operator(char* ident) {
   int i;
   for (i = 0; i < operator_size; ++i) {
 //    printf("[cmp : %c %c]\n", operator_list[i], ch);
-    if (ch == operator_list[i]) {
+    if (!strcmp(operator_list[i], ident)) {
       return i;
     }
   }
@@ -85,27 +85,71 @@ void next_token() {
         lexer_msg(error_msg);
         type = EOF_T;
       }
-    } else if ((i = search_operator()) != -1) {
+    } else if ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
+      position_ident = 0;
+      while ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
+        identifier[position_ident++] = ch;
+        get_ch(&count);
+        identifier[position_ident] = '\0';
+//        printf("[ident : %c]\n", identifier[position_ident - 1]);
+      }
+      /*Search in Operators*/
+
+      if (position_ident <= 1) {
+        if ((i = search_operator(identifier)) != -1) {
+          type = OP_T;
+          fprintf(stdout, "[op : %s]\n", operator_list[i]);
+        } else {
+          sprintf(error_msg, "Unknown operator: %s", identifier);
+          lexer_msg(error_msg);
+          type = EOF_T;
+       }
+      } else if (position_ident > 1) {
+        int j = 0;
+        while (j <= position_ident) {
+          char tmp = identifier[j + 2];
+          identifier[j + 2] = '\0';
+          if ((i = search_operator((&identifier[j]))) != -1) {
+            j = j + 2;
+            identifier[j] = tmp;
+            type = OP_T;
+            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+            continue;
+          }
+
+          identifier[j + 2] = tmp;
+          tmp = identifier[j + 1];
+          identifier[j + 1] = '\0';
+          if ((i = search_operator((&identifier[j]))) != -1) {
+            j = j + 1;
+            identifier[j] = tmp;
+            type = OP_T;
+            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+            continue;
+          }
+        }
+      }
     /*Search in Operators*/
-      type = OP_T;
-      get_ch(&count);
+  //    type = OP_T;
+  //    get_ch(&count);
     } else {
       sprintf(error_msg, "Unknown symbol: %c", ch);
       lexer_error(error_msg);
       type = EOF_T;
     }
-    if (ch != '\n') {
-//      fprintf(stdout, "[ch : %c]\n", ch);
-    } else {
-      fprintf(stdout, "[newline]\n");
-    }
 //    fprintf(stdout, "[type : %d]\n", type);
     if (type == OP_T) {
-      fprintf(stdout, "[op : %c]\n", operator_list[i]);
+//      fprintf(stdout, "[op : %s]\n", operator_list[i]);
     } else if (type == ID_T) {
       fprintf(stdout, "[id : %s]\n", lexem_list[i]);
     } else if (type == NUM_T) {
       fprintf(stdout, "[num : %d]\n", value);
+    }
+
+    if (ch != '\n') {
+    //      fprintf(stdout, "[ch : %c]\n", ch);
+    } else {
+      fprintf(stdout, "[newline]\n");
     }
 
     if (ch != ' ') {

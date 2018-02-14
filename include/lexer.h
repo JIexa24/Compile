@@ -13,7 +13,7 @@
 #define  ID_T   4
 
 #define  lexem_size 3
-#define  operator_size 12
+#define  operator_size 15
 #define  buffer_size 100
 
 void get_ch(int* k);
