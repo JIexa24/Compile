@@ -1,9 +1,7 @@
 #include "../include/compile.h"
 
-extern char operator_list[12];
-extern char lexem_list[3][100];
-static int lexem_size = 3;
-static int operator_size = 12;
+extern char operator_list[operator_size];
+extern char lexem_list[lexem_size][buffer_size];
 static char ch = ' ';
 
 void get_ch(int* k) {
@@ -50,8 +48,8 @@ void next_token() {
   int i = -1;
   int type = NONE_T;
   int count = -1;
-  char* identifier = (char*)malloc(256 * sizeof(char));
-  char* error_msg  = (char*)malloc(256 * sizeof(char));
+  char* identifier = (char*)malloc(buffer_size * sizeof(char));
+  char* error_msg  = (char*)malloc(buffer_size * sizeof(char));
 
   ch = ' ';
 

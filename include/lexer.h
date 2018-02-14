@@ -12,6 +12,10 @@
 #define  OP_T   3
 #define  ID_T   4
 
+#define  lexem_size 3
+#define  operator_size 12
+#define  buffer_size 100
+
 void get_ch(int* k);
 
 int is_digit();
