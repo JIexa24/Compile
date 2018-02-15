@@ -11,6 +11,7 @@
 #define  NUM_T  2
 #define  OP_T   3
 #define  ID_T   4
+#define  LEXEM_T   5
 
 #define  lexem_size 3
 #define  operator_size 15

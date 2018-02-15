@@ -79,11 +79,12 @@ void next_token() {
       identifier[position_ident] = '\0';
       /*Search in Lexems*/
       if ((i = search_lexem(identifier)) != -1) {
-         type = ID_T;
+         type = LEXEM_T;
       } else {
-        sprintf(error_msg, "May be variable: %s", identifier);
-        lexer_msg(error_msg);
-        type = EOF_T;
+        //sprintf(error_msg, "May be variable: %s", identifier);
+        //lexer_msg(error_msg);
+        //type = EOF_T;
+        type = ID_T;
       }
     } else if ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
       position_ident = 0;
@@ -144,10 +145,12 @@ void next_token() {
 //    fprintf(stdout, "[type : %d]\n", type);
     if (type == OP_T) {
 //      fprintf(stdout, "[op : %s]\n", operator_list[i]);
-    } else if (type == ID_T) {
-      fprintf(stdout, "[id : %s]\n", lexem_list[i]);
+    } else if (type == LEXEM_T) {
+      fprintf(stdout, "[lexem : %s]\n", lexem_list[i]);
     } else if (type == NUM_T) {
       fprintf(stdout, "[num : %d]\n", value);
+    } else if (type == ID_T) {
+      fprintf(stdout, "[id : %s]\n", identifier);
     }
 
     if (ch != '\n') {
