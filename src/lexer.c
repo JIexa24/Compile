@@ -74,9 +74,9 @@ int next_token() {
       get_ch();
       continue;
     } else if (is_digit()) {
-      while (is_digit() || ch == 'E' || ch == '-' || ch == '+') {
+      while (is_digit() || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
         identifier[position_ident++] = ch;
-        if (ch == 'E'){
+        if (ch == 'E' || ch =='e'){
           expform = 1;
           get_ch();
           continue;
