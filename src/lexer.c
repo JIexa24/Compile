@@ -3,6 +3,7 @@
 extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
 static char ch = ' ';
+token_t* tokens;
 
 void get_ch() {
   scanf("%c", &ch);
@@ -41,7 +42,7 @@ int search_lexem(char* ident) {
   return -1;
 }
 
-void next_token() {
+int next_token() {
   int value = 0;
   int position_ident = 0;
   int i = -1;
@@ -94,7 +95,8 @@ void next_token() {
       if (position_ident <= 1) {
         if ((i = search_operator(identifier)) != -1) {
           type = OP_T;
-          fprintf(stdout, "[op : %s]\n", operator_list[i]);
+//          fprintf(stdout, "[op : %s]\n", operator_list[i]);
+          tokens = list_addend(tokens, type, value, identifier);
         } else {
           sprintf(error_msg, "Unknown operator: %s", identifier);
           lexer_msg(error_msg);
@@ -110,7 +112,8 @@ void next_token() {
             j = j + 2;
             identifier[j] = tmp;
             type = OP_T;
-            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+//            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+            tokens = list_addend(tokens, type, value, operator_list[i]);
             continue;
           }
 
@@ -121,7 +124,8 @@ void next_token() {
             j = j + 1;
             identifier[j] = tmp;
             type = OP_T;
-            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+//            fprintf(stdout, "[op : %s]\n", operator_list[i]);
+            tokens = list_addend(tokens, type, value, operator_list[i]);
             continue;
           }
           sprintf(error_msg, "Unknown operator: %s", identifier);
@@ -130,18 +134,21 @@ void next_token() {
         }
       }
     } else {
-      sprintf(error_msg, "Unknown symbol: %c", ch);
+//      sprintf(error_msg, "Unknown symbol: %c", ch);
       lexer_error(error_msg);
       type = EOF_T;
     }
     if (type == OP_T) {
 
     } else if (type == LEXEM_T) {
-      fprintf(stdout, "[lexem : %s]\n", lexem_list[i]);
+//      fprintf(stdout, "[lexem : %s]\n", identifier);
+      tokens = list_addend(tokens, type, value, identifier);
     } else if (type == NUM_T) {
-      fprintf(stdout, "[num : %d]\n", value);
+//      fprintf(stdout, "[num : %d]\n", value);
+      tokens = list_addend(tokens, type, value, identifier);
     } else if (type == ID_T) {
-      fprintf(stdout, "[id : %s]\n", identifier);
+//      fprintf(stdout, "[id : %s]\n", identifier);
+      tokens = list_addend(tokens, type, value, identifier);
     }
 
     if (ch != '\n') {
@@ -154,11 +161,14 @@ void next_token() {
       type = NONE_T;
     }
   }
+  return type;
 }
 
 void lexer() {
-  while (1) {
+  int type = NONE_T;
+  while (type != EOF_T) {
     printf("--------------------------------\n");
-    next_token();
+    type = next_token();
   }
+  list_print(tokens);
 }

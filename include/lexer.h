@@ -34,7 +34,7 @@ int search_operator();
 
 int search_lexem(char* ident);
 
-void next_token();
+int next_token();
 
 void lexer();
 

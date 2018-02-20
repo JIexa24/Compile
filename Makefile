@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g3 -O0
 
 all: LIST LEXER ./obj/main.o
-	$(CC) ./obj/data.o ./obj/lexer.o ./obj/main.o -o ./bin/compile $(CFLAGS)
+	$(CC) ./obj/data.o ./obj/lexer.o ./obj/main.o ./obj/list.o -o ./bin/compile $(CFLAGS)
 
 ./obj/main.o: ./src/main.c
 	$(CC) -c ./src/main.c -o ./obj/main.o
@@ -16,6 +16,7 @@ LEXER: ./obj/data.o ./obj/lexer.o
 	$(CC) -c ./src/data.c -o ./obj/data.o
 
 LIST: ./obj/list.o
+
 ./obj/list.o: ./src/list.c
 	$(CC) -c ./src/list.c -o ./obj/list.o
 

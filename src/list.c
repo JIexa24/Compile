@@ -28,3 +28,20 @@ token_t* list_addend(token_t* head, int type, int val, char* ident) {
 
   return head;
 }
+
+void list_print(token_t* head) {
+  token_t* p =  head;
+  while (p != NULL) {
+    printf("-----------token----------------\n");
+    if (p->type_token == OP_T) {
+      fprintf(stdout, "[op : %s]\n", p->identifier);
+    } else if (p->type_token == LEXEM_T) {
+      fprintf(stdout, "[lexem : %s]\n", p->identifier);
+    } else if (p->type_token == NUM_T) {
+      fprintf(stdout, "[num : %d]\n", p->value);
+    } else if (p->type_token == ID_T) {
+      fprintf(stdout, "[id : %s]\n", p->identifier);
+    }
+    p = p->next;
+  }
+}
