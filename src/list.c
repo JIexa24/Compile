@@ -1,6 +1,6 @@
 #include "../include/compile.h"
 
-token_t* list_createnode(int type, int val, char* ident, int id) {
+token_t* list_createnode(int type, double val, char* ident, int id) {
   token_t* p;
   p = (token_t*)malloc(sizeof(*p));
 
@@ -15,7 +15,7 @@ token_t* list_createnode(int type, int val, char* ident, int id) {
   return p;
 }
 
-token_t* list_addend(token_t* head, int type, int val, char* ident, int id) {
+token_t* list_addend(token_t* head, int type, double val, char* ident, int id) {
   token_t* cursor = head;
   token_t* p = list_createnode(type, val, ident, id);
 
@@ -39,7 +39,7 @@ void list_print(token_t* head) {
     } else if (p->type_token == LEXEM_T) {
       fprintf(stdout, "[lexem : %s | id : %d]\n", p->identifier, p->id);
     } else if (p->type_token == NUM_T) {
-      fprintf(stdout, "[num : %d]\n", p->value);
+      fprintf(stdout, "[num : %.4lf]\n", p->value);
     } else if (p->type_token == IDENT_T) {
       fprintf(stdout, "[ident : %s | id : %d]\n", p->identifier, p->id);
     }

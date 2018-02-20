@@ -45,10 +45,15 @@ int search_lexem(char* ident) {
 }
 
 int next_token() {
-  int value = 0;
+  double value = 0;
   int position_ident = 0;
   int i = -1;
+  int j = 0;
+  int expform = 0;
+  int expradix = 0;
   int type = NONE_T;
+  char signexp = '+';
+  char tmp = '\0';
   char* identifier = (char*)malloc(buffer_size * sizeof(char));
   char* error_msg  = (char*)malloc(buffer_size * sizeof(char));
 
@@ -56,6 +61,8 @@ int next_token() {
 
   while (type == NONE_T) {
     i = -1;
+    j = 0;
+    expform = 0;
     position_ident = 0;
     identifier[position_ident] = '\0';
     value = 0;
@@ -67,12 +74,27 @@ int next_token() {
       get_ch();
       continue;
     } else if (is_digit()) {
-      while (is_digit()) {
+      while (is_digit() || ch == 'E' || ch == '-' || ch == '+') {
         identifier[position_ident++] = ch;
-        value = value * 10 + (ch - '0');
+        if (ch == 'E'){
+          expform = 1;
+          get_ch();
+          continue;
+        }
+        if (expform == 0) {
+          value = value * 10 + (ch - '0');
+        } else {
+          if (ch == '-' || ch == '+') {
+            signexp = ch;
+          } else {
+            expradix = expradix * 10 + (ch - '0');
+          }
+        }
         get_ch();
       }
+      expradix = (signexp == '-') ? (-expradix) : expradix;
       identifier[position_ident] = '\0';
+      value = value * pow(10, expradix);
       type = NUM_T;
     } else if (is_char()) {
       while (is_char() || is_digit()) {
@@ -82,7 +104,7 @@ int next_token() {
       identifier[position_ident] = '\0';
       /*Search in Lexems*/
       if ((i = search_lexem(identifier)) != -1) {
-         type = LEXEM_T;
+        type = LEXEM_T;
       } else {
         type = IDENT_T;
       }
@@ -105,8 +127,6 @@ int next_token() {
           type = EOF_T;
        }
       } else if (position_ident > 1) {
-        int j = 0;
-        char tmp;
         while (j < position_ident) {
           tmp = identifier[j + 2];
           identifier[j + 2] = '\0';
