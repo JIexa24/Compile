@@ -1,6 +1,6 @@
 #include "../include/compile.h"
 
-token_t* list_createnode(int type, int val, char* ident) {
+token_t* list_createnode(int type, int val, char* ident, int id) {
   token_t* p;
   p = (token_t*)malloc(sizeof(*p));
 
@@ -8,15 +8,16 @@ token_t* list_createnode(int type, int val, char* ident) {
     p->type_token = type;
     p->value = val;
     p->next = NULL;
+    p->id = id;
     strcpy(p->identifier, ident);
   }
 
   return p;
 }
 
-token_t* list_addend(token_t* head, int type, int val, char* ident) {
+token_t* list_addend(token_t* head, int type, int val, char* ident, int id) {
   token_t* cursor = head;
-  token_t* p = list_createnode(type, val, ident);
+  token_t* p = list_createnode(type, val, ident, id);
 
   if (head == NULL) return p;
 
@@ -36,11 +37,11 @@ void list_print(token_t* head) {
     if (p->type_token == OP_T) {
       fprintf(stdout, "[op : %s]\n", p->identifier);
     } else if (p->type_token == LEXEM_T) {
-      fprintf(stdout, "[lexem : %s]\n", p->identifier);
+      fprintf(stdout, "[lexem : %s | id : %d]\n", p->identifier, p->id);
     } else if (p->type_token == NUM_T) {
       fprintf(stdout, "[num : %d]\n", p->value);
-    } else if (p->type_token == ID_T) {
-      fprintf(stdout, "[id : %s]\n", p->identifier);
+    } else if (p->type_token == IDENT_T) {
+      fprintf(stdout, "[ident : %s | id : %d]\n", p->identifier, p->id);
     }
     p = p->next;
   }

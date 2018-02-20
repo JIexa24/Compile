@@ -2,8 +2,10 @@
 
 extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
-static char ch = ' ';
 token_t* tokens;
+
+static char ch = ' ';
+static int token_counter = 0;
 
 void get_ch() {
   scanf("%c", &ch);
@@ -17,7 +19,7 @@ int is_digit() {
 }
 
 int is_char() {
-  if (('a' <= ch) && (ch <= 'z')) {
+  if (('a' <= ch) && (ch <= 'z') || ('A' <= ch) && (ch <= 'Z')) {
     return 1;
   } else return 0;
 }
@@ -73,7 +75,7 @@ int next_token() {
       identifier[position_ident] = '\0';
       type = NUM_T;
     } else if (is_char()) {
-      while (is_char()) {
+      while (is_char() || is_digit()) {
         identifier[position_ident++] = ch;
         get_ch();
       }
@@ -82,7 +84,7 @@ int next_token() {
       if ((i = search_lexem(identifier)) != -1) {
          type = LEXEM_T;
       } else {
-        type = ID_T;
+        type = IDENT_T;
       }
     } else if ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
       position_ident = 0;
@@ -96,7 +98,7 @@ int next_token() {
         if ((i = search_operator(identifier)) != -1) {
           type = OP_T;
 //          fprintf(stdout, "[op : %s]\n", operator_list[i]);
-          tokens = list_addend(tokens, type, value, identifier);
+          tokens = list_addend(tokens, type, value, identifier, NOT_ID);
         } else {
           sprintf(error_msg, "Unknown operator: %s", identifier);
           lexer_msg(error_msg);
@@ -113,7 +115,7 @@ int next_token() {
             identifier[j] = tmp;
             type = OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
-            tokens = list_addend(tokens, type, value, operator_list[i]);
+            tokens = list_addend(tokens, type, value, operator_list[i], NOT_ID);
             continue;
           }
 
@@ -125,7 +127,7 @@ int next_token() {
             identifier[j] = tmp;
             type = OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
-            tokens = list_addend(tokens, type, value, operator_list[i]);
+            tokens = list_addend(tokens, type, value, operator_list[i], NOT_ID);
             continue;
           }
           sprintf(error_msg, "Unknown operator: %s", identifier);
@@ -142,13 +144,13 @@ int next_token() {
 
     } else if (type == LEXEM_T) {
 //      fprintf(stdout, "[lexem : %s]\n", identifier);
-      tokens = list_addend(tokens, type, value, identifier);
+      tokens = list_addend(tokens, type, value, identifier, token_counter++);
     } else if (type == NUM_T) {
 //      fprintf(stdout, "[num : %d]\n", value);
-      tokens = list_addend(tokens, type, value, identifier);
-    } else if (type == ID_T) {
+      tokens = list_addend(tokens, type, value, identifier, NOT_ID);
+    } else if (type == IDENT_T) {
 //      fprintf(stdout, "[id : %s]\n", identifier);
-      tokens = list_addend(tokens, type, value, identifier);
+      tokens = list_addend(tokens, type, value, identifier, token_counter++);
     }
 
     if (ch != '\n') {

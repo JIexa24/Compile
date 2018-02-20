@@ -5,23 +5,25 @@
 #define lexer_msg(msg) fprintf(stdout, "Lexer message: %s\n", msg)
 #define print_ch(ch) fprintf(stdout, "[symb : %c]\n", ch)
 
-
 #define  EOF_T  0
 #define  NONE_T 1
 #define  NUM_T  2
 #define  OP_T   3
-#define  ID_T   4
+#define  IDENT_T   4
 #define  LEXEM_T   5
 
 #define  lexem_size 3
 #define  operator_size 15
 #define  buffer_size 100
 
+#define NOT_ID -1
+
 typedef struct token_s {
   int type_token;
   int value;
-  char identifier[buffer_size];
+  int id;
   struct token_s *next;
+  char identifier[buffer_size];
 } token_t;
 
 void get_ch();
