@@ -7,5 +7,6 @@
 #include <unistd.h>
 
 #include "./lexer.h"
+#include "./list.h"
 
 #endif

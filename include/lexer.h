@@ -17,7 +17,14 @@
 #define  operator_size 15
 #define  buffer_size 100
 
-void get_ch(int* k);
+typedef struct token_s {
+  int type_token;
+  int value;
+  char identifier[buffer_size];
+  struct token_s *next;
+} token_t;
+
+void get_ch();
 
 int is_digit();
 

@@ -4,8 +4,8 @@ extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
 static char ch = ' ';
 
-void get_ch(int* k) {
-  *k = read(0, &ch, 1);
+void get_ch() {
+  read(0, &ch, 1);
 }
 
 int is_digit() {
@@ -47,7 +47,6 @@ void next_token() {
   int position_ident = 0;
   int i = -1;
   int type = NONE_T;
-  int count = -1;
   char* identifier = (char*)malloc(buffer_size * sizeof(char));
   char* error_msg  = (char*)malloc(buffer_size * sizeof(char));
 
@@ -60,20 +59,23 @@ void next_token() {
       type = EOF_T;
       break;
     } else if (ch == ' ') {
-      get_ch(&count);
+      get_ch();
       continue;
     } else if (is_digit()) {
       value = 0;
+      position_ident = 0;
       while (is_digit()) {
+        identifier[position_ident++] = ch;
         value = value * 10 + (ch - '0');
-        get_ch(&count);
+        get_ch();
       }
+      identifier[position_ident] = '\0';
       type = NUM_T;
     } else if (is_char()) {
       position_ident = 0;
       while (is_char()) {
         identifier[position_ident++] = ch;
-        get_ch(&count);
+        get_ch();
 //        printf("[ident : %c]\n", identifier[position_ident - 1]);
       }
       identifier[position_ident] = '\0';
@@ -90,12 +92,12 @@ void next_token() {
       position_ident = 0;
       while ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
         identifier[position_ident++] = ch;
-        get_ch(&count);
+        get_ch();
         identifier[position_ident] = '\0';
 //        printf("[ident : %c]\n", identifier[position_ident - 1]);
       }
-      /*Search in Operators*/
 
+      /*Search in Operators*/
       if (position_ident <= 1) {
         if ((i = search_operator(identifier)) != -1) {
           type = OP_T;
@@ -134,9 +136,6 @@ void next_token() {
           type = EOF_T;
         }
       }
-    /*Search in Operators*/
-  //    type = OP_T;
-  //    get_ch(&count);
     } else {
       sprintf(error_msg, "Unknown symbol: %c", ch);
       lexer_error(error_msg);
@@ -156,7 +155,7 @@ void next_token() {
     if (ch != '\n') {
     //      fprintf(stdout, "[ch : %c]\n", ch);
     } else {
-      fprintf(stdout, "[newline]\n");
+    //  fprintf(stdout, "[newline]\n");
     }
 
     if (ch != ' ') {
