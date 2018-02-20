@@ -5,7 +5,8 @@ extern char lexem_list[lexem_size][buffer_size];
 static char ch = ' ';
 
 void get_ch() {
-  read(0, &ch, 1);
+  scanf("%c", &ch);
+//  read(0, &ch, 1);
 }
 
 int is_digit() {
@@ -23,7 +24,6 @@ int is_char() {
 int search_operator(char* ident) {
   int i;
   for (i = 0; i < operator_size; ++i) {
-//    printf("[cmp : %c %c]\n", operator_list[i], ch);
     if (!strcmp(operator_list[i], ident)) {
       return i;
     }
@@ -34,7 +34,6 @@ int search_operator(char* ident) {
 int search_lexem(char* ident) {
   int i = 0;
   for (i = 0; i < lexem_size; ++i) {
-//    printf("[strcmp : %s %s]\n", lexem_list[i], ident);
     if (!strcmp(lexem_list[i], ident)) {
       return i;
     }
@@ -54,7 +53,10 @@ void next_token() {
 
   while (type == NONE_T) {
     i = -1;
-//    print_ch(ch);
+    position_ident = 0;
+    identifier[position_ident] = '\0';
+    value = 0;
+
     if (ch == '\0' || ch == '\n' || ch == EOF/*EOF*/) {
       type = EOF_T;
       break;
@@ -62,8 +64,6 @@ void next_token() {
       get_ch();
       continue;
     } else if (is_digit()) {
-      value = 0;
-      position_ident = 0;
       while (is_digit()) {
         identifier[position_ident++] = ch;
         value = value * 10 + (ch - '0');
@@ -72,20 +72,15 @@ void next_token() {
       identifier[position_ident] = '\0';
       type = NUM_T;
     } else if (is_char()) {
-      position_ident = 0;
       while (is_char()) {
         identifier[position_ident++] = ch;
         get_ch();
-//        printf("[ident : %c]\n", identifier[position_ident - 1]);
       }
       identifier[position_ident] = '\0';
       /*Search in Lexems*/
       if ((i = search_lexem(identifier)) != -1) {
          type = LEXEM_T;
       } else {
-        //sprintf(error_msg, "May be variable: %s", identifier);
-        //lexer_msg(error_msg);
-        //type = EOF_T;
         type = ID_T;
       }
     } else if ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
@@ -93,10 +88,8 @@ void next_token() {
       while ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
         identifier[position_ident++] = ch;
         get_ch();
-        identifier[position_ident] = '\0';
-//        printf("[ident : %c]\n", identifier[position_ident - 1]);
       }
-
+      identifier[position_ident] = '\0';
       /*Search in Operators*/
       if (position_ident <= 1) {
         if ((i = search_operator(identifier)) != -1) {
@@ -141,9 +134,8 @@ void next_token() {
       lexer_error(error_msg);
       type = EOF_T;
     }
-//    fprintf(stdout, "[type : %d]\n", type);
     if (type == OP_T) {
-//      fprintf(stdout, "[op : %s]\n", operator_list[i]);
+
     } else if (type == LEXEM_T) {
       fprintf(stdout, "[lexem : %s]\n", lexem_list[i]);
     } else if (type == NUM_T) {
