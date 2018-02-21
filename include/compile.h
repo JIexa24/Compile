@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <math.h>
+#include <fcntl.h>
 
 #include "./lexer.h"
 #include "./list.h"

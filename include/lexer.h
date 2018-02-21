@@ -1,8 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#define lexer_error(msg) fprintf(stderr, "Lexer error: %s\n", msg)
-#define lexer_msg(msg) fprintf(stdout, "Lexer message: %s\n", msg)
+#define lexer_error(msg) fprintf(stderr, "\E[31mLexer error\E[39m: %s\n", msg)
+#define lexer_msg(msg) fprintf(stdout, "\E[32mLexer message\E[39m: %s\n", msg)
 #define print_ch(ch) fprintf(stdout, "[symb : %c]\n", ch)
 
 #define  EOF_T  0
@@ -26,11 +26,19 @@ typedef struct token_s {
   char identifier[buffer_size];
 } token_t;
 
-void get_ch();
+void open_fd(char* filename);
+
+void close_fd();
+
+int get_ch();
 
 int is_digit();
 
 int is_char();
+
+int is_space();
+
+int is_nl();
 
 int search_operator();
 

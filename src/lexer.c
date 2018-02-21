@@ -3,19 +3,44 @@
 extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
 token_t* tokens;
-
+static int fd = 0;
 static char ch = ' ';
 static int token_counter = 0;
+static char error_msg[buffer_size];
 
-void get_ch() {
-  scanf("%c", &ch);
-//  read(0, &ch, 1);
+void open_fd(char* filename) {
+  if ((fd = open(filename, O_RDONLY)) == -1) {
+    sprintf(error_msg, "Can't open file : %s\nRead from stdin", filename);
+    lexer_error(error_msg);
+    fd = 0;
+  }
+}
+
+void close_fd() {
+  if (fd != 0) {
+    close(fd);
+  }
+}
+
+int get_ch() {
+//  scanf("%c", &ch);
+  return read(fd, &ch, 1);
 }
 
 int is_digit() {
   if (('0' <= ch) && (ch <= '9')) {
     return 1;
   } else return 0;
+}
+
+int is_space() {
+  if (ch == ' ') return 1;
+  else return 0;
+}
+
+int is_nl() {
+  if (ch == '\n') return 1;
+  else return 0;
 }
 
 int is_char() {
@@ -55,7 +80,6 @@ int next_token() {
   char signexp = '+';
   char tmp = '\0';
   char* identifier = (char*)malloc(buffer_size * sizeof(char));
-  char* error_msg  = (char*)malloc(buffer_size * sizeof(char));
 
   ch = ' ';
 
@@ -67,11 +91,11 @@ int next_token() {
     identifier[position_ident] = '\0';
     value = 0;
 
-    if (ch == '\0' || ch == '\n' || ch == EOF/*EOF*/) {
+    if (ch == '\0' || ch == EOF/*EOF*/) {
       type = EOF_T;
       break;
-    } else if (ch == ' ') {
-      get_ch();
+    } else if (is_space() || is_nl()) {
+      if (get_ch() == 0) type = EOF_T;
       continue;
     } else if (is_digit()) {
       while (is_digit() || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
@@ -108,9 +132,9 @@ int next_token() {
       } else {
         type = IDENT_T;
       }
-    } else if ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
+    } else if ((is_char() == 0) && (is_digit() == 0) && (is_nl() == 0)) {
       position_ident = 0;
-      while ((is_char() == 0) && (is_digit() == 0) && ch != '\n') {
+      while ((is_char() == 0) && (is_digit() == 0 && is_space() == 0) && (is_nl() == 0)) {
         identifier[position_ident++] = ch;
         get_ch();
       }
@@ -156,9 +180,9 @@ int next_token() {
         }
       }
     } else {
-//      sprintf(error_msg, "Unknown symbol: %c", ch);
+      sprintf(error_msg, "Unknown symbol: %c", ch);
       lexer_error(error_msg);
-      type = EOF_T;
+      get_ch();
     }
     if (type == OP_T) {
 
