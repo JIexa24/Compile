@@ -76,14 +76,14 @@ int lexer_next_token() {
   int j = 0;
   int expform = 0;
   int expradix = 0;
-  int type = NONE_T;
+  int type = L_NONE_T;
   char signexp = '+';
   char tmp = '\0';
   char* identifier = (char*)malloc(buffer_size * sizeof(char));
 
   ch = ' ';
 
-  while (type == NONE_T) {
+  while (type == L_NONE_T) {
     i = -1;
     j = 0;
     expform = 0;
@@ -92,10 +92,10 @@ int lexer_next_token() {
     value = 0;
 
     if (ch == '\0' || ch == EOF/*EOF*/) {
-      type = EOF_T;
+      type = L_EOF_T;
       break;
     } else if (is_space() || is_nl()) {
-      if (get_ch() == 0) type = EOF_T;
+      if (get_ch() == 0) type = L_EOF_T;
       continue;
     } else if (is_digit()) {
       while (is_digit() || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
@@ -119,7 +119,7 @@ int lexer_next_token() {
       expradix = (signexp == '-') ? (-expradix) : expradix;
       identifier[position_ident] = '\0';
       value = value * pow(10, expradix);
-      type = NUM_T;
+      type = L_NUM_T;
     } else if (is_char()) {
       while (is_char() || is_digit()) {
         identifier[position_ident++] = ch;
@@ -128,9 +128,9 @@ int lexer_next_token() {
       identifier[position_ident] = '\0';
       /*Search in Lexems*/
       if ((i = search_lexem(identifier)) != -1) {
-        type = LEXEM_T;
+        type = L_LEXEM_T;
       } else {
-        type = IDENT_T;
+        type = L_IDENT_T;
       }
     } else if ((is_char() == 0) && (is_digit() == 0) && (is_nl() == 0)) {
       position_ident = 0;
@@ -142,13 +142,13 @@ int lexer_next_token() {
       /*Search in Operators*/
       if (position_ident <= 1) {
         if ((i = search_operator(identifier)) != -1) {
-          type = OP_T;
+          type = L_OP_T;
 //          fprintf(stdout, "[op : %s]\n", operator_list[i]);
           tokens = list_lexer_addend(tokens, type, value, operator_list[i], i, NOT_ID);
         } else {
           sprintf(error_msg, "Unknown operator: %s", identifier);
           lexer_msg(error_msg);
-          type = EOF_T;
+          type = L_EOF_T;
        }
       } else if (position_ident > 1) {
         while (j < position_ident) {
@@ -157,7 +157,7 @@ int lexer_next_token() {
           if ((i = search_operator((&identifier[j]))) != -1) {
             j = j + 2;
             identifier[j] = tmp;
-            type = OP_T;
+            type = L_OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
             tokens = list_lexer_addend(tokens, type, value, operator_list[i], i, NOT_ID);
             continue;
@@ -169,14 +169,14 @@ int lexer_next_token() {
           if ((i = search_operator((&identifier[j]))) != -1) {
             j = j + 1;
             identifier[j] = tmp;
-            type = OP_T;
+            type = L_OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
             tokens = list_lexer_addend(tokens, type, value, operator_list[i], i, NOT_ID);
             continue;
           }
           sprintf(error_msg, "Unknown operator: %s", identifier);
           lexer_msg(error_msg);
-          type = EOF_T;
+          type = L_EOF_T;
         }
       }
     } else {
@@ -184,15 +184,15 @@ int lexer_next_token() {
       lexer_error(error_msg);
       get_ch();
     }
-    if (type == OP_T) {
+    if (type == L_OP_T) {
 
-    } else if (type == LEXEM_T) {
+    } else if (type == L_LEXEM_T) {
 //      fprintf(stdout, "[lexem : %s]\n", identifier);
       tokens = list_lexer_addend(tokens, type, value, identifier, i, token_counter++);
-    } else if (type == NUM_T) {
+    } else if (type == L_NUM_T) {
 //      fprintf(stdout, "[num : %d]\n", value);
       tokens = list_lexer_addend(tokens, type, value, identifier, NOT_ID, NOT_ID);
-    } else if (type == IDENT_T) {
+    } else if (type == L_IDENT_T) {
 //      fprintf(stdout, "[id : %s]\n", identifier);
       tokens = list_lexer_addend(tokens, type, value, identifier, NOT_ID, token_counter++);
     }
@@ -204,15 +204,15 @@ int lexer_next_token() {
     }
 
     if (ch != ' ') {
-      type = NONE_T;
+      type = L_NONE_T;
     }
   }
   return type;
 }
 
 void lexer() {
-  int type = NONE_T;
-  while (type != EOF_T) {
+  int type = L_NONE_T;
+  while (type != L_EOF_T) {
     printf("--------------------------------\n");
     type = lexer_next_token();
   }

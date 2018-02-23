@@ -5,12 +5,12 @@
 #define lexer_msg(msg) fprintf(stdout, "\E[32mLexer message\E[39m: %s\n", msg)
 #define print_ch(ch) fprintf(stdout, "[symb : %c]\n", ch)
 
-#define  EOF_T  0
-#define  NONE_T 1
-#define  NUM_T  2
-#define  OP_T   3
-#define  IDENT_T   4
-#define  LEXEM_T   5
+#define  L_EOF_T  0
+#define  L_NONE_T 1
+#define  L_NUM_T  2
+#define  L_OP_T   3
+#define  L_IDENT_T   4
+#define  L_LEXEM_T   5
 
 #define  lexem_size 3
 #define  operator_size 15

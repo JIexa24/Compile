@@ -35,13 +35,13 @@ void list_lexer_print(token_t* head) {
   token_t* p =  head;
   while (p != NULL) {
     printf("-----------token----------------\n");
-    if (p->type_token == OP_T) {
+    if (p->type_token == L_OP_T) {
       fprintf(stdout, "[op : %s | index : %d]\n", p->identifier, p->index);
-    } else if (p->type_token == LEXEM_T) {
+    } else if (p->type_token == L_LEXEM_T) {
       fprintf(stdout, "[lexem : %s | id : %d | index : %d]\n", p->identifier, p->id, p->index);
-    } else if (p->type_token == NUM_T) {
+    } else if (p->type_token == L_NUM_T) {
       fprintf(stdout, "[num : %.4lf | index : %d]\n", p->value, p->index);
-    } else if (p->type_token == IDENT_T) {
+    } else if (p->type_token == L_IDENT_T) {
       fprintf(stdout, "[ident : %s | id : %d | index : %d]\n", p->identifier, p->id, p->index);
     }
     p = p->next;
