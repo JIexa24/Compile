@@ -69,7 +69,7 @@ int search_lexem(char* ident) {
   return -1;
 }
 
-int next_token() {
+int lexer_next_token() {
   double value = 0;
   int position_ident = 0;
   int i = -1;
@@ -214,7 +214,7 @@ void lexer() {
   int type = NONE_T;
   while (type != EOF_T) {
     printf("--------------------------------\n");
-    type = next_token();
+    type = lexer_next_token();
   }
   list_lexer_print(tokens);
 }
