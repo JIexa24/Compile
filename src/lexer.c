@@ -144,7 +144,7 @@ int next_token() {
         if ((i = search_operator(identifier)) != -1) {
           type = OP_T;
 //          fprintf(stdout, "[op : %s]\n", operator_list[i]);
-          tokens = list_addend(tokens, type, value, identifier, NOT_ID);
+          tokens = list_addend(tokens, type, value, operator_list[i], i, NOT_ID);
         } else {
           sprintf(error_msg, "Unknown operator: %s", identifier);
           lexer_msg(error_msg);
@@ -159,7 +159,7 @@ int next_token() {
             identifier[j] = tmp;
             type = OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
-            tokens = list_addend(tokens, type, value, operator_list[i], NOT_ID);
+            tokens = list_addend(tokens, type, value, operator_list[i], i, NOT_ID);
             continue;
           }
 
@@ -171,7 +171,7 @@ int next_token() {
             identifier[j] = tmp;
             type = OP_T;
 //            fprintf(stdout, "[op : %s]\n", operator_list[i]);
-            tokens = list_addend(tokens, type, value, operator_list[i], NOT_ID);
+            tokens = list_addend(tokens, type, value, operator_list[i], i, NOT_ID);
             continue;
           }
           sprintf(error_msg, "Unknown operator: %s", identifier);
@@ -188,13 +188,13 @@ int next_token() {
 
     } else if (type == LEXEM_T) {
 //      fprintf(stdout, "[lexem : %s]\n", identifier);
-      tokens = list_addend(tokens, type, value, identifier, token_counter++);
+      tokens = list_addend(tokens, type, value, identifier, i, token_counter++);
     } else if (type == NUM_T) {
 //      fprintf(stdout, "[num : %d]\n", value);
-      tokens = list_addend(tokens, type, value, identifier, NOT_ID);
+      tokens = list_addend(tokens, type, value, identifier, NOT_ID, NOT_ID);
     } else if (type == IDENT_T) {
 //      fprintf(stdout, "[id : %s]\n", identifier);
-      tokens = list_addend(tokens, type, value, identifier, token_counter++);
+      tokens = list_addend(tokens, type, value, identifier, NOT_ID, token_counter++);
     }
 
     if (ch != '\n') {

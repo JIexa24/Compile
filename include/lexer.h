@@ -20,8 +20,9 @@
 
 typedef struct token_s {
   int type_token;
-  double value;
   int id;
+  int index;
+  double value;
   struct token_s *next;
   char identifier[buffer_size];
 } token_t;
