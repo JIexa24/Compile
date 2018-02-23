@@ -22,4 +22,4 @@ LIST: ./obj/list.o
 	$(CC) -c ./src/list.c -o ./obj/list.o
 
 clean:
-	rm ./obj/*.o
+	rm -f ./obj/*.o
