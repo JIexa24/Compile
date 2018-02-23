@@ -1,6 +1,6 @@
 #include "../include/compile.h"
 
-token_t* list_createnode(int type, double val, char* ident, int index, int id) {
+token_t* list_lexer_createnode(int type, double val, char* ident, int index, int id) {
   token_t* p;
   p = (token_t*)malloc(sizeof(*p));
 
@@ -16,9 +16,9 @@ token_t* list_createnode(int type, double val, char* ident, int index, int id) {
   return p;
 }
 
-token_t* list_addend(token_t* head, int type, double val, char* ident, int index, int id) {
+token_t* list_lexer_addend(token_t* head, int type, double val, char* ident, int index, int id) {
   token_t* cursor = head;
-  token_t* p = list_createnode(type, val, ident, index, id);
+  token_t* p = list_lexer_createnode(type, val, ident, index, id);
 
   if (head == NULL) return p;
 
@@ -31,7 +31,7 @@ token_t* list_addend(token_t* head, int type, double val, char* ident, int index
   return head;
 }
 
-void list_print(token_t* head) {
+void list_lexer_print(token_t* head) {
   token_t* p =  head;
   while (p != NULL) {
     printf("-----------token----------------\n");
