@@ -3,10 +3,15 @@
 extern char operator_list[operator_size][buffer_size];
 extern char lexem_list[lexem_size][buffer_size];
 token_t* tokens;
+static int token_counter = 0;
 static int fd = 0;
 static char ch = ' ';
-static int token_counter = 0;
 static char error_msg[buffer_size];
+
+static int get_ch() {
+//  scanf("%c", &ch);
+  return read(fd, &ch, 1);
+}
 
 void open_fd(char* filename) {
   if ((fd = open(filename, O_RDONLY)) == -1) {
@@ -22,29 +27,24 @@ void close_fd() {
   }
 }
 
-int get_ch() {
-//  scanf("%c", &ch);
-  return read(fd, &ch, 1);
-}
-
-int is_digit() {
-  if (('0' <= ch) && (ch <= '9')) {
+int is_digit(char* sym) {
+  if (('0' <= *sym) && (*sym <= '9')) {
     return 1;
   } else return 0;
 }
 
-int is_space() {
-  if (ch == ' ') return 1;
+int is_space(char* sym) {
+  if (*sym == ' ') return 1;
   else return 0;
 }
 
-int is_nl() {
-  if (ch == '\n') return 1;
+int is_nl(char* sym) {
+  if (*sym == '\n') return 1;
   else return 0;
 }
 
-int is_char() {
-  if (('a' <= ch) && (ch <= 'z') || ('A' <= ch) && (ch <= 'Z')) {
+int is_char(char* sym) {
+  if (('a' <= *sym) && (*sym <= 'z') || ('A' <= *sym) && (*sym <= 'Z')) {
     return 1;
   } else return 0;
 }
@@ -94,11 +94,11 @@ int lexer_next_token() {
     if (ch == '\0' || ch == EOF/*EOF*/) {
       type = L_EOF_T;
       break;
-    } else if (is_space() || is_nl()) {
+    } else if (is_space(&ch) || is_nl(&ch)) {
       if (get_ch() == 0) type = L_EOF_T;
       continue;
-    } else if (is_digit()) {
-      while (is_digit() || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
+    } else if (is_digit(&ch)) {
+      while (is_digit(&ch) || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
         identifier[position_ident++] = ch;
         if (ch == 'E' || ch =='e'){
           expform = 1;
@@ -120,8 +120,8 @@ int lexer_next_token() {
       identifier[position_ident] = '\0';
       value = value * pow(10, expradix);
       type = L_NUM_T;
-    } else if (is_char()) {
-      while (is_char() || is_digit()) {
+    } else if (is_char(&ch)) {
+      while (is_char(&ch) || is_digit(&ch)) {
         identifier[position_ident++] = ch;
         get_ch();
       }
@@ -132,9 +132,9 @@ int lexer_next_token() {
       } else {
         type = L_IDENT_T;
       }
-    } else if ((is_char() == 0) && (is_digit() == 0) && (is_nl() == 0)) {
+    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_nl(&ch) == 0)) {
       position_ident = 0;
-      while ((is_char() == 0) && (is_digit() == 0 && is_space() == 0) && (is_nl() == 0)) {
+      while ((is_char(&ch) == 0) && (is_digit(&ch) == 0 && is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
         identifier[position_ident++] = ch;
         get_ch();
       }

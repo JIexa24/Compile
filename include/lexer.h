@@ -31,17 +31,15 @@ void open_fd(char* filename);
 
 void close_fd();
 
-int get_ch();
+int is_digit(char* sym);
 
-int is_digit();
+int is_char(char* sym);
 
-int is_char();
+int is_space(char* sym);
 
-int is_space();
+int is_nl(char* sym);
 
-int is_nl();
-
-int search_operator();
+int search_operator(char* ident);
 
 int search_lexem(char* ident);
 
