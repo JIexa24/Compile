@@ -27,12 +27,12 @@ void parser_next_token() {
 parser_node_t* parse_parent() {
   parser_node_t* p = NULL;
   if (strcmp(cursor_tokens->identifier, "(") != 0) {
-    parser_error("While : Expected (");
+    parser_error("Expected (");
   }
   parser_next_token();
   p = parse_expr();
   if (strcmp(cursor_tokens->identifier, ")") != 0) {
-    parser_error("While : Expected )");
+    parser_error("Expected )");
   }
   parser_next_token();
   return p;
