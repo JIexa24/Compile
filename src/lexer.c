@@ -188,7 +188,7 @@ int lexer_next_token() {
 
     } else if (type == L_LEXEM_T) {
 //      fprintf(stdout, "[lexem : %s]\n", identifier);
-      tokens = list_lexer_addend(tokens, type, value, identifier, i, token_counter++);
+      tokens = list_lexer_addend(tokens, type, value, identifier, i, NOT_ID);
     } else if (type == L_NUM_T) {
 //      fprintf(stdout, "[num : %d]\n", value);
       tokens = list_lexer_addend(tokens, type, value, identifier, NOT_ID, NOT_ID);
