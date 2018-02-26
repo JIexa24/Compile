@@ -38,7 +38,7 @@ void list_lexer_print(token_t* head) {
     if (p->type_token == L_OP_T) {
       fprintf(stdout, "[op : %s | index : %d]\n", p->identifier, p->index);
     } else if (p->type_token == L_LEXEM_T) {
-      fprintf(stdout, "[lexem : %s | id : %d | index : %d]\n", p->identifier, p->id, p->index);
+      fprintf(stdout, "[lexem : %s | index : %d]\n", p->identifier, p->index);
     } else if (p->type_token == L_NUM_T) {
       fprintf(stdout, "[num : %.4lf | index : %d]\n", p->value, p->index);
     } else if (p->type_token == L_IDENT_T) {
