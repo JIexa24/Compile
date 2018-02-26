@@ -48,12 +48,12 @@ parser_node_t* parse_expr() {
 parser_node_t* parse_brace() {
   parser_node_t* p = NULL;
   if (strcmp(cursor_tokens->identifier, "{") != 0) {
-    parser_error("While : Expected {");
+    parser_error("Expected {");
   }
   parser_next_token();
   p = parsing();
   if (strcmp(cursor_tokens->identifier, "}") != 0) {
-    parser_error("While : Expected }");
+    parser_error("Expected }");
   }
   parser_next_token();
   return p;
