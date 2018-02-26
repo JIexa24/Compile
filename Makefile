@@ -21,5 +21,10 @@ LIST: ./obj/list.o
 ./obj/list.o: ./src/list.c
 	$(CC) -c ./src/list.c -o ./obj/list.o
 
+PARSER: ./obj/parser.o
+
+./obj/parser.o: ./src/parser.c
+	$(CC) -c ./src/parser.c -o ./obj/parser.o
+
 clean:
 	rm -f ./obj/*.o

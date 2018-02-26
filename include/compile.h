@@ -10,5 +10,6 @@
 
 #include "./lexer.h"
 #include "./list.h"
+#include "./parser.h"
 
 #endif
