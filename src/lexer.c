@@ -33,6 +33,12 @@ int is_digit(char* sym) {
   } else return 0;
 }
 
+int is_delim(char* sym) {
+  if (*sym == '\n' || *sym == ' ' || *sym == '\t')
+    return 1;
+  else return 0;
+}
+
 int is_space(char* sym) {
   if (*sym == ' ') return 1;
   else return 0;
@@ -94,7 +100,7 @@ int lexer_next_token() {
     if (ch == '\0' || ch == EOF/*EOF*/) {
       type = L_EOF_T;
       break;
-    } else if (is_space(&ch) || is_nl(&ch)) {
+    } else if (is_delim(&ch)) {
       if (get_ch() == 0) type = L_EOF_T;
       continue;
     } else if (is_digit(&ch)) {
@@ -132,9 +138,9 @@ int lexer_next_token() {
       } else {
         type = L_IDENT_T;
       }
-    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
+    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_delim(&ch) == 0)) {
       position_ident = 0;
-      while ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
+      while ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_delim(&ch) == 0)) {
         identifier[position_ident++] = ch;
         get_ch();
       }
@@ -213,7 +219,7 @@ int lexer_next_token() {
 void lexer() {
   int type = L_NONE_T;
   while (type != L_EOF_T) {
-    printf("--------------------------------\n");
+//    printf("--------------------------------\n");
     type = lexer_next_token();
   }
   list_lexer_print(tokens);

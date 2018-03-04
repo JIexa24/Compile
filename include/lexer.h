@@ -35,6 +35,8 @@ int is_digit(char* sym);
 
 int is_char(char* sym);
 
+int is_delim(char* sym) ;
+
 int is_space(char* sym);
 
 int is_nl(char* sym);
