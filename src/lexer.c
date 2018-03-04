@@ -132,9 +132,9 @@ int lexer_next_token() {
       } else {
         type = L_IDENT_T;
       }
-    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_nl(&ch) == 0)) {
+    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
       position_ident = 0;
-      while ((is_char(&ch) == 0) && (is_digit(&ch) == 0 && is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
+      while ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_space(&ch) == 0) && (is_nl(&ch) == 0)) {
         identifier[position_ident++] = ch;
         get_ch();
       }
