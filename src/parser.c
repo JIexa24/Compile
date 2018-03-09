@@ -21,7 +21,7 @@ static parser_node_t* parser_createnode(int type, double value,
 void parser_next_token() {
   if (cursor_tokens == NULL) cursor_tokens = tokens;
   else if (cursor_tokens->next != NULL) cursor_tokens = cursor_tokens->next;
-  else parser_error("parser_next_token : end");
+  else parser_msg("parser_next_token : end");
 }
 
 parser_node_t* parse_parent() {
@@ -40,7 +40,7 @@ parser_node_t* parse_parent() {
 
 parser_node_t* parse_expr() {
   parser_node_t* p = NULL;
-
+  
   parser_next_token();
   return p;
 }
@@ -73,5 +73,6 @@ parser_node_t* parsing() {
 }
 
 void parser() {
+  parser_next_token();
   nodes = parser_createnode(P_PROGRAMM_T, 0, parsing(), NULL, NULL);
 }
