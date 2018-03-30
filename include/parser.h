@@ -6,6 +6,7 @@
 
 #define P_PROGRAMM_T 0
 #define P_WHILE_T 1
+#define P_COMPARE_T 2
 
 typedef struct parser_node_s {
   int type_node;
