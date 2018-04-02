@@ -18,7 +18,7 @@ static parser_node_t* parser_createnode(int type, double value,
   return p;
 }
 
-void parser_next_token() {
+static void parser_next_token() {
   if (cursor_tokens == NULL) cursor_tokens = tokens;
   else if (cursor_tokens->next != NULL) cursor_tokens = cursor_tokens->next;
   else parser_msg("parser_next_token : end");
