@@ -18,8 +18,6 @@ typedef struct parser_node_s {
 
 void parser();
 
-void parser_next_token();
-
 parser_node_t* parse_parent();
 
 parser_node_t* parse_expr();
