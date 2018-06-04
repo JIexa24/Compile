@@ -13,6 +13,7 @@ struct listnode
 {
 	char *key;
 	int value;
+	int type;
 	struct listnode *next;
 	struct listnode *coll;
 };

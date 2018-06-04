@@ -22,6 +22,5 @@ int main(int argc, char **argv)
 	yylineno = 1;
 	hashtab_init(hashtab);
 	yyparse();
-	hashtab_print(hashtab);
 	return 0;
 }

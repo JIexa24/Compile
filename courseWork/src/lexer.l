@@ -117,7 +117,7 @@ SIGN [-+]
   return DNUM;
 }
 
-"int"|"double" {
+"int"|"float" {
 	//printf("KEYWORD_TYPE (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
   yylval.str = strdup(yytext);
@@ -164,6 +164,13 @@ SIGN [-+]
  	ch += yyleng;
   yylval.str = strdup(yytext);
   return RETURN;
+}
+
+"print" {
+	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
+ 	ch += yyleng;
+  yylval.str = strdup(yytext);
+  return PRINT;
 }
 
 ("_"|{LETTER})("_"|{LETTER}|{DIGIT})* {

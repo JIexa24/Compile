@@ -15,7 +15,7 @@ int codeGen(struct ast* t) {
 
   /*strings print*/
   printf("-------------GENERATE ASM-------------\n");
-
+  printf("INT:\n\t.string \"%%d\"\n");
   printf(".section .text\n");
   printf(".type main, @function\n");
   printf(".globl main\n\n");
@@ -41,6 +41,7 @@ static void gen(struct ast* t) {
       case P_DEF1_T:
         gen(t->left);
         gen(t->middle);
+        printf("\n\t");
       break;
       case P_ID_T:
         tmp = hashtab_lookup(hashtab, t->key);
@@ -52,18 +53,36 @@ static void gen(struct ast* t) {
       case P_CONST_T:
         printf("movl $%s, %%eax\n\t", t->key);
       break;
+      case P_DEF2_T:
+        tmp = hashtab_lookup(hashtab, t->left->key);
+        if (tmp != NULL){
+          printf("movl $0, %d(%%rbp)\n\t", -4*(tmp->value) - 4);
+        }
+      break;
       case P_OP_T:
         genExpr(t);
       break;
       case P_RET_T:
-          printf("mov $%s, %%eax\n\t", t->key);
+          printf("movl $%s, %%eax\n\t", t->key);
           printf("popq %%rbp\n\t");
           printf("ret\n\t");
+      break;
+      case P_OUT_T:
+          tmp = hashtab_lookup(hashtab, t->left->key);
+          if (tmp != NULL) {
+            printf("movl $1, %%eax\n\t");
+            if (tmp->type == 0)
+            printf("movl $INT, %%edi\n\t");
+            printf("movl %d(%%rbp), %%esi\n\t", -4*(tmp->value) - 4);
+            printf("call printf\n\t");
+            printf("\n\t");
+          }
       break;
       default: break;
     }
   }
 }
+
 static void genExpr(struct ast* t) {
   struct listnode* tmp = NULL;
   int load = exprLoad;
@@ -85,6 +104,18 @@ static void genExpr(struct ast* t) {
               printf("addl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
             else
               printf("addl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '-':
+            if (tmp != NULL)
+              printf("subl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("subl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '*':
+            if (tmp != NULL)
+              printf("mull %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("mull $%s, %%eax\n\t", t->middle->key);
           break;
         }
       break;

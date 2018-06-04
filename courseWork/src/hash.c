@@ -28,6 +28,7 @@ void hashtab_add(struct listnode **hashtab, char *key, int value)
 		{
 			node->key = strdup(key);
 			node->value = value;
+			node->type = -1;
 			node->coll = hashtab[index];
 			hashtab[index] = node;
 		}
@@ -76,7 +77,7 @@ void hashtab_print(struct listnode **hashtab)
 	printf("\n\n\t\t\tHASH TABLE:\n\n");
 	for (i = 0; i < HASHTAB_SIZE; ++i){
 		if (hashtab[i] != NULL) {
-			printf("\tNode #%d:\t%s\t-\t%d\n", i + 1, hashtab[i]->key, hashtab[i]->value);
+			printf("\tNode #%d:\t%s\t-\t%d\t=%d\n", i + 1, hashtab[i]->key, hashtab[i]->value, hashtab[i]->type);
 
 	  	if (hashtab[i]->coll != NULL) {
 	  		printf("\tNote: This Node (#%d) has collision\n", i + 1);

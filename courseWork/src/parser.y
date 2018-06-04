@@ -18,31 +18,49 @@
     struct ast* ast_tree;
 }
 
-%token <str> IF THEN ELSE WHILE DO ID RETURN
+%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT
 %token <str> TYPEVAR
 %token <str> INUM DNUM
 %token <str> ASSIGN
 %token <str> CMP
 %token <str> SEMCOL SPACE LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
 %type <str> CONST
-%type <ast_tree> ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
+%type <ast_tree> OUT ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
 %%
 
-PROG: START {print_ast($1, 0);codeGen($1);free_ast($1);};
+PROG: START {
+  if (errcount > 0)
+    yyerror("Err~");
+  else {
+    print_ast($1, 0);
+    codeGen($1);
+    free_ast($1);
+  	hashtab_print(hashtab);
+  }
+};
 
 START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
        | STATE {$$ = $1;};
 
-STATE: error SEMCOL {errcount = errcount + 1;};
+STATE: error SEMCOL {errcount = errcount + 1;
+  yyerror("Some error deteceted~");};
 
-STATE: DEFVAR { printf("def0\n");$$ = $1;}
-       | DEFVAR1 { printf("def1\n");$$ = $1;}
-       | DEFVAR2  { printf("def2\n");}
-       | WHILELOOP  { printf("whileloop\n");$$ = $1;}
-       | RET { printf("return\n");$$ = $1;}
+STATE: DEFVAR { $$ = $1;}
+       | DEFVAR1 { $$ = $1;}
+       | DEFVAR2 { $$ = $1;}
+       | WHILELOOP  { $$ = $1;}
+       | RET { $$ = $1;}
+       | OUT { $$ = $1;}
+
+OUT: PRINT VAR SEMCOL {
+  $$ = ast_createNode(P_OUT_T, $1, $2, NULL, NULL);
+};
 
 /*int v = 5 + b;*/
 DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
+  struct ast* tmpast = $2;
+  struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
+  tmphash->type = !strcmp($1, "int") ? 0 : 1;
   $$ = ast_createNode(P_DEF_T, $1, $4, $2, NULL);
 };
 
@@ -72,6 +90,10 @@ EXPR2:  VAR {$$ = $1;}
 
 /*int v;*/
 DEFVAR2: TYPEVAR ID_TOK SEMCOL {
+  struct ast* tmpast = $2;
+  struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
+  tmphash->type = !strcmp($1, "int") ? 0 : 1;
+  $$ = ast_createNode(P_DEF2_T, $1, $2, NULL, NULL);
 };
 
 RET: RETURN CONST SEMCOL {$$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);}
@@ -99,6 +121,10 @@ COND:  VAR {$$ = $1;}
 };
 
 ID_TOK: ID {
+  if (hashtab_lookup(hashtab, $1) != NULL){
+    ++errcount;
+    yyerror("Redefinition var~");
+  }
   hashtab_add(hashtab, $1, var_counter++);
   $$ = ast_createNode(P_ID_T, $1, NULL, NULL, NULL);
 };
@@ -120,5 +146,5 @@ CONST:  INUM
 %%
 void yyerror(char *errmsg)
 {
-	fprintf(stderr, "%s (%d, %d): %s\n", errmsg, yylineno, ch, yytext);
+	fprintf(stderr, "Error: %s (%d, %d): %s\n", errmsg, yylineno, ch, yytext);
 }

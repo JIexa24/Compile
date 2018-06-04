@@ -9,7 +9,9 @@ struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, st
     p->left = l;
     p->middle = m;
     p->right = r;
+    #if DEBUG==1
     printf("Node (%p) | (%d %s %p %p %p) create!\n",p, type, key, l, m, r);
+    #endif
   }
 
   return p;
