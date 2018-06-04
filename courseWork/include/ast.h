@@ -21,6 +21,7 @@ struct ast {
 #define P_DEF_T 5
 #define P_DEF1_T 6
 #define P_VAR_T 7
+#define P_RET_T 8
 
 struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, struct ast* r);
 void print_ast(struct ast* t, int l);

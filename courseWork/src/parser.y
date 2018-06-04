@@ -10,6 +10,7 @@
 	extern int yylex();
 	void yyerror(char *);
   int errcount = 0;
+  int var_counter = 0;
 %}
 
 %union {
@@ -17,19 +18,19 @@
     struct ast* ast_tree;
 }
 
-%token <str> IF THEN ELSE WHILE DO ID
+%token <str> IF THEN ELSE WHILE DO ID RETURN
 %token <str> TYPEVAR
 %token <str> INUM DNUM
 %token <str> ASSIGN
 %token <str> CMP
 %token <str> SEMCOL SPACE LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
 %type <str> CONST
-%type <ast_tree> PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
+%type <ast_tree> RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
 %%
 
 PROG: START {print_ast($1, 0);codeGen($1);free_ast($1);};
 
-START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $2, $1, NULL);}
+START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
        | STATE {$$ = $1;};
 
 STATE: error SEMCOL {errcount = errcount + 1;};
@@ -38,10 +39,11 @@ STATE: DEFVAR { printf("def0\n");$$ = $1;}
        | DEFVAR1 { printf("def1\n");$$ = $1;}
        | DEFVAR2  { printf("def2\n");}
        | WHILELOOP  { printf("whileloop\n");$$ = $1;}
+       | RET { printf("return\n");$$ = $1;}
 
 /*int v = 5 + b;*/
 DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
-  $$ = ast_createNode(P_DEF_T, $1, $2, $4, NULL);
+  $$ = ast_createNode(P_DEF_T, $1, $4, $2, NULL);
 };
 
 /*v = 5 + b;*/
@@ -72,6 +74,7 @@ EXPR2:  VAR {$$ = $1;}
 DEFVAR2: TYPEVAR ID_TOK SEMCOL {
 };
 
+RET: RETURN CONST SEMCOL {$$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);}
 BODY: STATE
       | STATELIST;
 
@@ -96,7 +99,7 @@ COND:  VAR {$$ = $1;}
 };
 
 ID_TOK: ID {
-  hashtab_add(hashtab, $1, ch * 10);
+  hashtab_add(hashtab, $1, var_counter++);
   $$ = ast_createNode(P_VAR_T, $1, NULL, NULL, NULL);
 };
 

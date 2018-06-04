@@ -29,72 +29,141 @@ SIGN [-+]
 <COMM><<EOF>> { ch += yyleng; yyerror("Unterminated comment"); BEGIN INITIAL; }
 \/\/(.)*(\n|$) { ch += yyleng; }
 
-";" return SEMCOL;
-"+" return PLUS;
-"-" return MINUS;
-"*" return MUL;
-"/" return DIV;
-"%" return MOD;
-"&" return AND;
-"|" return OR;
-"^" return XOR;
-"!" return NO;
-"~" return NOT;
-"(" return LB;
-")" return RB;
-"{" return LF;
-"}" return RF;
-"<" return LOW;
-">" return BIG;
-"==" return EQ;
+";" {
+  yylval.str = strdup(yytext);
+  return SEMCOL;
+}
+"+" {
+  yylval.str = strdup(yytext);
+  return PLUS;
+}
+"-" {
+  yylval.str = strdup(yytext);
+  return MINUS;
+}
+"*" {
+  yylval.str = strdup(yytext);
+  return MUL;
+}
+"/" {
+  yylval.str = strdup(yytext);
+  return DIV;
+}
+"%" {
+  yylval.str = strdup(yytext);
+  return MOD;
+}
+"&" {
+  yylval.str = strdup(yytext);
+  return AND;
+}
+"|" {
+  yylval.str = strdup(yytext);
+  return OR;
+}
+"^" {
+  yylval.str = strdup(yytext);
+  return XOR;
+}
+"!" {
+  yylval.str = strdup(yytext);
+  return NO;
+}
+"~" {
+  yylval.str = strdup(yytext);
+  return NOT;
+}
+"(" {
+  yylval.str = strdup(yytext);
+  return LB;
+}
+")" {
+  yylval.str = strdup(yytext);
+  return RB;
+}
+"{" {
+  yylval.str = strdup(yytext);
+  return LF;
+}
+"}" {
+  yylval.str = strdup(yytext);
+  return RF;
+}
+"<" {
+  yylval.str = strdup(yytext);
+  return LOW;
+}
+">" {
+  yylval.str = strdup(yytext);
+  return BIG;
+}
+"==" {
+  yylval.str = strdup(yytext);
+  return EQ;
+}
 
 {SIGN}?{DIGIT}+ {
-    ch += yyleng;
-    //yylval = atoi(yytext);
-    //printf("INT NUM (%d, %d): %s %d\n", yylineno, ch, yytext, yylval);
-    return INUM;
+  ch += yyleng;
+  yylval.str = strdup(yytext);
+  //yylval = atoi(yytext);
+  //printf("INT NUM (%d, %d): %s %d\n", yylineno, ch, yytext, yylval);
+  return INUM;
 }
 
 {SIGN}?({DIGIT}+\.{DIGIT}+|{DIGIT}+\.|{DIGIT}+)([eE]{SIGN}?{DIGIT}+)? {
-    ch += yyleng;
-    //printf("DOUBLE NUM (%d, %d): %s\n", yylineno, ch, yytext);
-    return DNUM;
+  ch += yyleng;
+  yylval.str = strdup(yytext);
+  //printf("DOUBLE NUM (%d, %d): %s\n", yylineno, ch, yytext);
+  return DNUM;
 }
 
 "int"|"double" {
 	//printf("KEYWORD_TYPE (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return TYPEVAR;
 }
 
 "do" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return DO;
 }
 
 "while" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return WHILE;
 }
 
 "if" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return IF;
 }
 
 "then" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return THEN;
 }
 
 "else" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
   return ELSE;
+}
+
+"return" {
+	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
+ 	ch += yyleng;
+  yylval.str = strdup(yytext);
+  return RETURN;
 }
 
 ("_"|{LETTER})("_"|{LETTER}|{DIGIT})* {
@@ -108,6 +177,7 @@ SIGN [-+]
 {OPER} {
 	//printf("OPERATION (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
+  yylval.str = strdup(yytext);
 	return CMP;
 }
 

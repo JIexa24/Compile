@@ -4,7 +4,7 @@ PARSE = bison
 CFLAGS = -g3 -O0
 LIB = -lm
 
-all: COMPILE
+all: clean COMPILE
 
 COMPILE: PARSER LEXER AST GEN MAIN
 
@@ -25,7 +25,7 @@ AST: ./src/ast.c
 	$(CC) -c ./src/ast.c -o ./obj/ast.o
 
 GEN: ./src/codegen.c
-	$(CC) -c ./src/codegen.c -o ./obj/codegen.o 
+	$(CC) -c ./src/codegen.c -o ./obj/codegen.o
 
 PARSER: ./src/parser.y
 	$(PARSE) -o ./src/parser.tab.c ./src/parser.y -dy
