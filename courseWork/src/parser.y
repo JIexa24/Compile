@@ -25,7 +25,7 @@
 %token <str> CMP
 %token <str> SEMCOL SPACE LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
 %type <str> CONST
-%type <ast_tree> RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
+%type <ast_tree> ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
 %%
 
 PROG: START {print_ast($1, 0);codeGen($1);free_ast($1);};
@@ -47,8 +47,8 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
 };
 
 /*v = 5 + b;*/
-DEFVAR1: ID ASSIGN EXPR SEMCOL {
-  $$ = ast_createNode(P_DEF1_T, $1, $3, NULL, NULL);
+DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
+  $$ = ast_createNode(P_DEF1_T, $2, $3, $1, NULL);
 };
 
 EXPR: EXPR0 {$$ = $1;}
@@ -57,7 +57,7 @@ EXPR: EXPR0 {$$ = $1;}
       | EXPR0 OR EXPR {$$ = NULL;};
 
 EXPR0:   EXPR1 {$$ = $1;}
-        | EXPR1 PLUS EXPR0
+        | EXPR1 PLUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
         | EXPR1 MINUS EXPR0 ;
 
 EXPR1:  EXPR2 {$$ = $1;}
@@ -100,11 +100,15 @@ COND:  VAR {$$ = $1;}
 
 ID_TOK: ID {
   hashtab_add(hashtab, $1, var_counter++);
-  $$ = ast_createNode(P_VAR_T, $1, NULL, NULL, NULL);
+  $$ = ast_createNode(P_ID_T, $1, NULL, NULL, NULL);
+};
+
+ID_TOK1: ID {
+  $$ = ast_createNode(P_ID_T, $1, NULL, NULL, NULL);
 };
 
 VAR:    CONST {
-  $$ = ast_createNode(P_VAR_T, $1, NULL, NULL, NULL);
+  $$ = ast_createNode(P_CONST_T, $1, NULL, NULL, NULL);
 }
         | ID {
   $$ = ast_createNode(P_VAR_T, $1, NULL, NULL, NULL);

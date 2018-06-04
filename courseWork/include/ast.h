@@ -13,6 +13,7 @@ struct ast {
 };
 
 #define P_NODE_T 255
+#define P_RET_T 254
 #define P_PROG_T 0
 #define P_WHILE_T 1
 #define P_COND_T 2
@@ -21,7 +22,7 @@ struct ast {
 #define P_DEF_T 5
 #define P_DEF1_T 6
 #define P_VAR_T 7
-#define P_RET_T 8
+#define P_OP_T 9
 
 struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, struct ast* r);
 void print_ast(struct ast* t, int l);

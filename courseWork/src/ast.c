@@ -17,7 +17,7 @@ struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, st
 
 void print_ast(struct ast* t, int l) {
   int i;
-  for (i = 0; i < l; ++i) printf("|");
+  for (i = 0; i < l; ++i) printf("|  ");
   if (t != NULL) {
     printf("%d | %s\n", t->type, t->key);
     print_ast(t->left, l + 1);
