@@ -24,5 +24,6 @@ struct ast {
 
 struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, struct ast* r);
 void print_ast(struct ast* t, int l);
-
+void free_ast(struct ast* t);
+int codeGen(struct ast* t);
 #endif

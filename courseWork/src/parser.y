@@ -27,7 +27,7 @@
 %type <ast_tree> PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
 %%
 
-PROG: START {print_ast($1, 0);};
+PROG: START {print_ast($1, 0);codeGen($1);free_ast($1);};
 
 START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $2, $1, NULL);}
        | STATE {$$ = $1;};

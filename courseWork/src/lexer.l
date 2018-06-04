@@ -19,8 +19,15 @@ DELIM[();{},:]
 WS[ \n\t]
 OPER [-+*/<>|?!%=~]
 SIGN [-+]
-
+%x COMM
 %%
+
+"/*" { ch += yyleng; BEGIN COMM; }
+<COMM>. { ch += yyleng; continue; }
+<COMM>\n { ch += yyleng; continue; }
+<COMM>"*/" { ch += yyleng; BEGIN INITIAL; }
+<COMM><<EOF>> { ch += yyleng; yyerror("Unterminated comment"); BEGIN INITIAL; }
+\/\/(.)*(\n|$) { ch += yyleng; }
 
 ";" return SEMCOL;
 "+" return PLUS;

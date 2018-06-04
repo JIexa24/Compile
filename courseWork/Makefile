@@ -6,10 +6,10 @@ LIB = -lm
 
 all: COMPILE
 
-COMPILE: PARSER LEXER AST MAIN
+COMPILE: PARSER LEXER AST GEN MAIN
 
 MAIN: ./obj/main.o
-	$(CC) ./obj/main.o ./obj/lexer.yy.o ./obj/parser.tab.o ./obj/hash.o ./obj/ast.o -o ./bin/tlpcc
+	$(CC) ./obj/main.o ./obj/lexer.yy.o ./obj/parser.tab.o ./obj/hash.o ./obj/ast.o ./obj/codegen.o -o ./bin/tlpcc
 
 ./obj/main.o: ./src/main.c
 	$(CC) -c ./src/main.c -o ./obj/main.o
@@ -23,6 +23,9 @@ HASH: ./src/hash.c
 
 AST: ./src/ast.c
 	$(CC) -c ./src/ast.c -o ./obj/ast.o
+
+GEN: ./src/codegen.c
+	$(CC) -c ./src/codegen.c -o ./obj/codegen.o 
 
 PARSER: ./src/parser.y
 	$(PARSE) -o ./src/parser.tab.c ./src/parser.y -dy

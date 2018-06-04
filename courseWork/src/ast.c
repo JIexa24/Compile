@@ -25,4 +25,13 @@ void print_ast(struct ast* t, int l) {
     print_ast(t->right, l + 1);
     printf("\n");
   } else printf("NULL\n");
-};
+}
+
+void free_ast(struct ast* t) {
+  if (t != NULL){
+    free_ast(t->left);
+    free_ast(t->middle);
+    free_ast(t->right);
+    free(t);
+  }
+}
