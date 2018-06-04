@@ -6,8 +6,7 @@ extern struct listnode* hashtab[];
 static int labelcount = 0;
 static int varcount = 0;
 static int exprLoad = 0;
-static int exprLastOpr = -1;
-/*& ^ | + - * / % ! ~*/
+
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
 
@@ -16,9 +15,9 @@ int codeGen(struct ast* t) {
   /*strings print*/
   printf("-------------GENERATE ASM-------------\n");
   printf("INT:\n\t.string \"%%d\"\n");
-  printf(".section .text\n");
-  printf(".type main, @function\n");
-  printf(".globl main\n\n");
+  printf("\t.section .text\n");
+  printf("\t.type main, @function\n");
+  printf("\t.globl main\n\n");
   printf("main:\n\t");
   printf("pushq %%rbp\n\t");
   printf("movq %%rsp, %%rbp\n\t");
@@ -26,8 +25,9 @@ int codeGen(struct ast* t) {
 
   /*generate*/
   gen(t);
-  printf("------------------------------\n\t");
+  printf("------------------------------\n");
 
+  printf("--------------------------------------\n");
   return 0;
 }
 
