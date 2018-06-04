@@ -1,22 +1,30 @@
-STRING:
-.string "b\n"
-INT:
-.string	"%d\n"
-.type main, @function
-.globl main
-main:
-  pushq %rbp
-  movq %rsp, %rbp
-  movl $0, %eax
-  movl $STRING, %edi
-  call printf
+.file	"test_c.c"
+.section	.rodata
+.LC0:
+.string	"%d"
+.text
+.globl	main
+.type	main, @function
 
-  movl $5, -4(%rbp)
-  addl $10, -4(%rbp)
-  movl $INT, %edi
-  movl -4(%rbp), %eax
-  movl %eax, %esi
-  call printf
+main:
+
+pushq	%rbp
+movq	%rsp, %rbp
+subq $16, %rsp
+
+
+	leaq	-12(%rbp), %rax
+	movq	%rax, %rsi
+	movl	$.LC0, %edi
+	movl	$0, %eax
+	call	__isoc99_scanf
+
   movl $0, %eax
-  popq %rbp
-  ret
+	movl $.LC0, %edi
+	movq -12(%rbp), %rsi
+	call printf
+
+movl	$0, %eax
+popq	%rbp
+addq $16, %rsp
+ret

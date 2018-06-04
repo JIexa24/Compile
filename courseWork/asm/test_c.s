@@ -1,9 +1,4 @@
 	.file	"test_c.c"
-	.section	.rodata
-.LC0:
-	.string	"a"
-.LC1:
-	.string	"%d\n"
 	.text
 	.globl	main
 	.type	main, @function
@@ -15,18 +10,26 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$16, %rsp
 	movl	$5, -4(%rbp)
-	addl	$6, -4(%rbp)
-	movl	$.LC0, %edi
-	call	puts
-	movl	-4(%rbp), %eax
-	movl	%eax, %esi
-	movl	$.LC1, %edi
+	orl	$2, -4(%rbp)
+#APP
+# 6 "test_c.c" 1
+	
+	
+# 0 "" 2
+#NO_APP
+	cmpl	$0, -4(%rbp)
+	jne	.L2
+	addl	$2, -4(%rbp)
+.L2:
+#APP
+# 10 "test_c.c" 1
+	
+	
+# 0 "" 2
+#NO_APP
 	movl	$0, %eax
-	call	printf
-	movl	$0, %eax
-	leave
+	popq	%rbp
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc

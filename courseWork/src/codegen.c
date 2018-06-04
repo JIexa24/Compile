@@ -3,37 +3,43 @@
 #include "./../include/ast.h"
 
 extern struct listnode* hashtab[];
+extern int var_counter;
 static int labelcount = 0;
 static int varcount = 0;
 static int exprLoad = 0;
+static int stackOffset = 0;
 
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
+static void genCond(struct ast* t);
 
 int codeGen(struct ast* t) {
 
   /*strings print*/
-  printf("-------------GENERATE ASM-------------\n");
+  //printf("-------------GENERATE ASM-------------\n");
+  printf("\t.section .rodata\n");
   printf("INT:\n\t.string \"%%d\"\n");
-  printf("\t.section .text\n");
-  printf("\t.type main, @function\n");
-  printf("\t.globl main\n\n");
+  printf("INTN:\n\t.string \"%%d\\n\"\n");
+  printf("\t.text\n");
+  printf("\t.globl main\n");
+  printf("\t.type main, @function\n\n");
   printf("main:\n\t");
   printf("pushq %%rbp\n\t");
   printf("movq %%rsp, %%rbp\n\t");
-  printf("------------------------------\n\t");
+  printf("subq $%d, %%rsp\n\t", var_counter * 4 + 8);
+  //printf("------------------------------\n\t");
 
   /*generate*/
   gen(t);
-  printf("------------------------------\n");
+  //printf("------------------------------\n");
 
-  printf("--------------------------------------\n");
+  //printf("--------------------------------------\n");
   return 0;
 }
 
 static void gen(struct ast* t) {
   if (t != NULL) {
-
+    int temp;
     struct listnode* tmp;
     switch (t->type) {
       case P_NODE_T:
@@ -41,6 +47,12 @@ static void gen(struct ast* t) {
       case P_DEF1_T:
         gen(t->left);
         gen(t->middle);
+        printf("\n\t");
+      break;
+      case P_IF_T:
+        gen(t->left);
+        gen(t->middle);
+        printf("\r.L%03d:\n\t", ++labelcount);
         printf("\n\t");
       break;
       case P_ID_T:
@@ -61,8 +73,13 @@ static void gen(struct ast* t) {
       break;
       case P_OP_T:
         genExpr(t);
+        exprLoad = 0;
+      break;
+      case P_COND_T:
+        genCond(t);
       break;
       case P_RET_T:
+          printf("addq $%d, %%rsp\n\t", var_counter * 4 + 8);
           printf("movl $%s, %%eax\n\t", t->key);
           printf("popq %%rbp\n\t");
           printf("ret\n\t");
@@ -70,11 +87,24 @@ static void gen(struct ast* t) {
       case P_OUT_T:
           tmp = hashtab_lookup(hashtab, t->left->key);
           if (tmp != NULL) {
-            printf("movl $1, %%eax\n\t");
+            printf("movl $0, %%eax\n\t");
             if (tmp->type == 0)
-            printf("movl $INT, %%edi\n\t");
-            printf("movl %d(%%rbp), %%esi\n\t", -4*(tmp->value) - 4);
+            printf("movl $INTN, %%edi\n\t");
+            printf("xorq %%rsi, %%rsi\n\t");
+            printf("movq %d(%%rbp), %%rsi\n\t", -4*(tmp->value) - 4);
             printf("call printf\n\t");
+            printf("\n\t");
+          }
+      break;
+      case P_IN_T:
+          tmp = hashtab_lookup(hashtab, t->left->key);
+          if (tmp != NULL) {
+            if (tmp->type == 0)
+            printf("leaq %d(%%rbp), %%rax\n\t", -4*(tmp->value) - 4);
+            printf("movq %%rax, %%rsi\n\t");
+            printf("movl $INT, %%edi\n\t");
+            printf("movl $0, %%eax\n\t");
+            printf("call __isoc99_scanf\n\t");
             printf("\n\t");
           }
       break;
@@ -83,15 +113,52 @@ static void gen(struct ast* t) {
   }
 }
 
+static void genCond(struct ast* t) {
+  struct listnode* tmp1 = NULL;
+  struct listnode* tmp2 = NULL;
+  int invert = 0;
+  if (t != NULL) {
+        tmp1 = hashtab_lookup(hashtab, t->left->key);
+        tmp2 = hashtab_lookup(hashtab, t->middle->key);
+        if (tmp1 != NULL && tmp2 == NULL) {
+          printf("cmpl $%s, %d(%%rbp)\n\t", t->middle->key,-4*(tmp1->value) - 4);
+          invert = 1;
+        } else if (tmp1 == NULL && tmp2 != NULL) {
+          printf("cmpl $%s, %d(%%rbp)\n\t", t->left->key,-4*(tmp2->value) - 4);
+          invert = 0;
+        }
+        
+        switch (t->key[0]) {
+          case '>':
+            if (invert == 1)
+            printf("jle .L%03d\n\t", labelcount + 1);
+            else
+            printf("jg .L%03d\n\t", labelcount + 1);
+          break;
+          case '<':
+            if (invert == 1)
+            printf("jns .L%03d\n\t", labelcount + 1);
+            else
+            printf("js .L%03d\n\t", labelcount + 1);
+          break;
+          case '=':
+           printf("jne .L%03d\n\t", labelcount + 1);
+          break;
+        }
+  }
+}
+
 static void genExpr(struct ast* t) {
   struct listnode* tmp = NULL;
   int load = exprLoad;
   if (t != NULL) {
-    tmp = hashtab_lookup(hashtab, t->key);
     genExpr(t->left);
+    tmp = hashtab_lookup(hashtab, t->key);
     switch (t->type) {
-      case P_VAR_T:
+      case P_ID_T:
+      case P_CONST_T:
           if (exprLoad == 0) {
+            printf("xorl %%eax, %%eax\n\t");
             printf("movl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
             exprLoad = 1;
           }
@@ -113,9 +180,42 @@ static void genExpr(struct ast* t) {
           break;
           case '*':
             if (tmp != NULL)
-              printf("mull %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+              printf("mull %d(%%rbp)6\n\t", -4*(tmp->value) - 4);
             else
               printf("mull $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '/':
+          case '%':
+            if (tmp != NULL)
+              printf("divl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("divl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '&':
+            if (tmp != NULL)
+              printf("andl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("andl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '|':
+            if (tmp != NULL)
+              printf("orl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("orl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '^':
+            if (tmp != NULL)
+              printf("xorl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("xorl $%s, %%eax\n\t", t->middle->key);
+          break;
+          case '!':
+          case '~':
+            tmp = hashtab_lookup(hashtab, t->left->key);
+            if (tmp != NULL)
+              printf("notl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+            else
+              printf("notl $%s, %%eax\n\t", t->left->key);
           break;
         }
       break;

@@ -18,24 +18,27 @@
     struct ast* ast_tree;
 }
 
-%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT
+%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN
 %token <str> TYPEVAR
 %token <str> INUM DNUM
 %token <str> ASSIGN
 %token <str> CMP
 %token <str> SEMCOL SPACE LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
 %type <str> CONST
-%type <ast_tree> OUT ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0 EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
+%type <ast_tree> EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
+%type <ast_tree> IFF IN OUT ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0
+
+
 %%
 
 PROG: START {
   if (errcount > 0)
     yyerror("Err~");
   else {
-    print_ast($1, 0);
+    //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
-  	hashtab_print(hashtab);
+  	//hashtab_print(hashtab);
   }
 };
 
@@ -51,9 +54,34 @@ STATE: DEFVAR { $$ = $1;}
        | WHILELOOP  { $$ = $1;}
        | RET { $$ = $1;}
        | OUT { $$ = $1;}
+       | IN { $$ = $1;}
+       | IFF { $$ = $1;}
+
+IFF: IF LB COND RB LF BODY RF {
+  $$ = ast_createNode(P_IF_T, $1, $3, $6, NULL);
+}
+     | IF LB COND RB LF BODY RF ELSE LF BODY RF {
+  $$ = ast_createNode(P_IF_T, $1, $3, $6, $10);
+}
+     | IF LB COND RB LF BODY RF ELSE STATE {
+  $$ = ast_createNode(P_IF_T, $1, $3, $6, $9);
+}
+     | IF LB COND RB STATE {
+  $$ = ast_createNode(P_IF_T, $1, $3, $5, NULL);
+}
+     | IF LB COND RB STATE ELSE STATE {
+  $$ = ast_createNode(P_IF_T, $1, $3, $5, $7);
+}
+     | IF LB COND RB STATE ELSE LF BODY RF {
+  $$ = ast_createNode(P_IF_T, $1, $3, $5, $8);
+}
 
 OUT: PRINT VAR SEMCOL {
   $$ = ast_createNode(P_OUT_T, $1, $2, NULL, NULL);
+};
+
+IN: SCAN ID_TOK1 SEMCOL {
+  $$ = ast_createNode(P_IN_T, $1, $2, NULL, NULL);
 };
 
 /*int v = 5 + b;*/
@@ -70,23 +98,23 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
 };
 
 EXPR: EXPR0 {$$ = $1;}
-      | EXPR0 AND EXPR {$$ = NULL;}
-      | EXPR0 XOR EXPR {$$ = NULL;}
-      | EXPR0 OR EXPR {$$ = NULL;};
+      | EXPR0 AND EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
+      | EXPR0 XOR EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
+      | EXPR0 OR EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
 
 EXPR0:   EXPR1 {$$ = $1;}
         | EXPR1 PLUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-        | EXPR1 MINUS EXPR0 ;
+        | EXPR1 MINUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
 
 EXPR1:  EXPR2 {$$ = $1;}
-        | EXPR2 MUL EXPR1
-        | EXPR2 DIV EXPR1
-        | EXPR2 MOD EXPR1;
+        | EXPR2 MUL EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
+        | EXPR2 DIV EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
+        | EXPR2 MOD EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
 
 EXPR2:  VAR {$$ = $1;}
-        | LB EXPR RB {}
-        | NOT EXPR {}
-        | NO EXPR {};
+        | LB EXPR RB {$$ = $2;}
+        | NOT EXPR {$$ = ast_createNode(P_OP_T, $1, $2, NULL, NULL);}
+        | NO EXPR {$$ = ast_createNode(P_OP_T, $1, $2, NULL, NULL);};
 
 /*int v;*/
 DEFVAR2: TYPEVAR ID_TOK SEMCOL {
@@ -110,14 +138,14 @@ WHILELOOP: WHILE LB COND RB LF BODY RF {
 };
 
 COND:  VAR {$$ = $1;}
-       | VAR LOW COND {
-  $$ = ast_createNode(P_COND_T, $2, $3, $1, NULL);
+       | VAR LOW VAR {
+  $$ = ast_createNode(P_COND_T, $2, $1, $3, NULL);
 }
-       | VAR BIG COND {
-  $$ = ast_createNode(P_COND_T, $2, $3, $1, NULL);
+       | VAR BIG VAR {
+  $$ = ast_createNode(P_COND_T, $2, $1, $3, NULL);
 }
-       | VAR EQ COND {
-  $$ = ast_createNode(P_COND_T, $2, $3, $1, NULL);
+       | VAR EQ VAR {
+  $$ = ast_createNode(P_COND_T, $2, $1, $3, NULL);
 };
 
 ID_TOK: ID {
@@ -130,14 +158,18 @@ ID_TOK: ID {
 };
 
 ID_TOK1: ID {
+  if (hashtab_lookup(hashtab, $1) == NULL){
+    ++errcount;
+    yyerror("Undefined var~");
+  }
   $$ = ast_createNode(P_ID_T, $1, NULL, NULL, NULL);
 };
 
 VAR:    CONST {
   $$ = ast_createNode(P_CONST_T, $1, NULL, NULL, NULL);
 }
-        | ID {
-  $$ = ast_createNode(P_VAR_T, $1, NULL, NULL, NULL);
+        | ID_TOK1 {
+  $$ = $1;
 };
 
 CONST:  INUM

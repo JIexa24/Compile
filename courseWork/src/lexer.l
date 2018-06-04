@@ -166,11 +166,18 @@ SIGN [-+]
   return RETURN;
 }
 
-"print" {
+"write" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
   yylval.str = strdup(yytext);
   return PRINT;
+}
+
+"read" {
+	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
+ 	ch += yyleng;
+  yylval.str = strdup(yytext);
+  return SCAN;
 }
 
 ("_"|{LETTER})("_"|{LETTER}|{DIGIT})* {

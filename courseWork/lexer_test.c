@@ -1,7 +1,11 @@
 int a := 10;
 int b := 3;
 int c := 4;
-b := a + 7;
 int d;
-print b;
+read d;
+a := a + d;
+if (15 > a) {
+  a := a + 1;
+}
+write a;
 return 0;
