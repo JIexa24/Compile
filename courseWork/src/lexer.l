@@ -16,13 +16,12 @@ int value = 10;
 DIGIT[0-9]
 LETTER[a-zA-Z]
 DELIM[();{},:]
-WS[ \t]
+WS[ \n\t]
 OPER [-+*/<>|?!%=~]
 SIGN [-+]
 
 %%
 
-"\n" return NEWLINE;
 ";" return SEMCOL;
 "+" return PLUS;
 "-" return MINUS;
@@ -44,7 +43,7 @@ SIGN [-+]
 
 {SIGN}?{DIGIT}+ {
     ch += yyleng;
-    yylval = atoi(yytext);
+    //yylval = atoi(yytext);
     //printf("INT NUM (%d, %d): %s %d\n", yylineno, ch, yytext, yylval);
     return INUM;
 }
@@ -92,10 +91,11 @@ SIGN [-+]
 }
 
 ("_"|{LETTER})("_"|{LETTER}|{DIGIT})* {
-	 //printf("IDENTIFIER (%d, %d): %s\n", yylineno, ch, yytext);
-   hashtab_add(hashtab, yytext, value*ch);
-	 ch += yyleng;
-   return ID;
+	//printf("IDENTIFIER (%d, %d): %s\n", yylineno, ch, yytext);
+  //hashtab_add(hashtab, yytext, value*ch);
+  yylval.str = strdup(yytext);
+	ch += yyleng;
+  return ID;
 }
 
 {OPER} {

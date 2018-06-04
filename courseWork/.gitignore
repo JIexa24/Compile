@@ -1,2 +1,7 @@
 /obj/*.o
 /bin/*
+/src/*.yy.c
+/src/*.tab.c
+/include/*.tab.h
+/*_test*
+/asm/*.out 
