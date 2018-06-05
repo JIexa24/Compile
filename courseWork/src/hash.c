@@ -32,7 +32,7 @@ void hashtab_add(struct listnode **hashtab, char *key, int value) {
 	struct listnode *look;
 	look = hashtab_lookup(hashtab, key);
   int index = hashtab_hash(key);
-  if (look != NULL) {
+  if (look == NULL) {
     node = malloc(sizeof(*node));
     if (node != NULL) {
       node->key = strdup(key);
@@ -41,7 +41,6 @@ void hashtab_add(struct listnode **hashtab, char *key, int value) {
       node->next = NULL;
       hashtab[index] = node;
     }
-    return;
   } else {
     // Вставка в начало списка
     node = malloc(sizeof(*node));

@@ -38,7 +38,7 @@ PROG: START {
     //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
-    //hashtab_print(hashtab);
+    hashtab_print(hashtab);
   }
 };
 
