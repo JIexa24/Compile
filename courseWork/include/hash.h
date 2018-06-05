@@ -6,16 +6,15 @@
 #include <string.h>
 #include <math.h>
 
-#define HASHTAB_MUL 31
 #define HASHTAB_SIZE 250
+#define HASHTAB_MUL 31
 
 struct listnode
 {
-	char *key;
-	int value;
-	int type;
-	struct listnode *next;
-	struct listnode *coll;
+  char *key;
+  int value;
+  int type;
+  struct listnode *next;
 };
 
 void hashtab_init(struct listnode **hashtab);

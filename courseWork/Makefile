@@ -1,7 +1,7 @@
 CC = gcc
 LEX = flex
 PARSE = bison
-CFLAGS = -g3 -O0
+CFLAGS = -g3 -O0 -Wall 
 LIB = -lm
 
 all: clean COMPILE

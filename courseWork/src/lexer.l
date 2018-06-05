@@ -7,7 +7,6 @@
 #include "./../include/hash.h"
 #include "./../include/parser.tab.h"
 extern void yyerror (char *);
-extern struct listnode* hashtab[];
 
 int ch;
 int value = 10;

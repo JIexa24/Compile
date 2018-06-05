@@ -7,15 +7,15 @@
   extern int ch;
   extern char *yytext;
   extern struct listnode* hashtab[];
-	extern int yylex();
-	void yyerror(char *);
+  extern int yylex();
+  void yyerror(char *);
   int errcount = 0;
   int var_counter = 0;
 %}
 
 %union {
-    char *str;
-    struct ast* ast_tree;
+  char *str;
+  struct ast* ast_tree;
 }
 
 %token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN
@@ -38,7 +38,7 @@ PROG: START {
     //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
-  	//hashtab_print(hashtab);
+    //hashtab_print(hashtab);
   }
 };
 
@@ -178,5 +178,5 @@ CONST:  INUM
 %%
 void yyerror(char *errmsg)
 {
-	fprintf(stderr, "Error: %s (%d, %d): %s\n", errmsg, yylineno, ch, yytext);
+  fprintf(stderr, "Error: %s (%d, %d): %s\n", errmsg, yylineno, ch, yytext);
 }
