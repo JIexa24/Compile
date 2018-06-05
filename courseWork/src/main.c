@@ -15,7 +15,7 @@ FILE *fileout;
 int main(int argc, char **argv)
 {
   int i = 0;
-  char *tmp;
+  int tmp;
   char outfilename[256];
   printf("Arguments count: %d\n\n", argc);
   if(argc < 2) {
@@ -53,15 +53,15 @@ int main(int argc, char **argv)
     strcpy(outfilename, argv[fdo]);
   }
 
-  tmp = strchr(argv[fdi], '.');
-  if (strcmp(tmp, ".c") != 0) {
+  tmp = strlen(argv[fdi]);
+  if (strcmp(&argv[fdi][tmp-2], ".c") != 0) {
     printf("Format input file unknown\n");
     return 1;
   }
 
 
-  tmp = strchr(outfilename, '.');
-  if (strcmp(tmp, ".s") != 0) {
+  tmp = strlen(outfilename);
+  if (strcmp(&outfilename[tmp-2], ".s") != 0) {
     printf("Format output file unknown\n");
     return 1;
   }
