@@ -12,9 +12,12 @@ if (a == 22) {
 }
 
 
-while (a < 19) {
+while (a < 20) {
   a:= a + 1;
 }
 
 write a;
+write b;
+write c;
+write d;
 return 0;

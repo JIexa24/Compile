@@ -1,10 +1,12 @@
 CC = gcc
 LEX = flex
 PARSE = bison
-CFLAGS = -g3 -O0 -Wall 
+CFLAGS = -g3 -O0 -Wall
 LIB = -lm
 
-all: clean COMPILE
+all: COMPILE TEST
+
+restruct: clean all
 
 COMPILE: PARSER LEXER AST GEN MAIN
 

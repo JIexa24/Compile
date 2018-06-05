@@ -47,7 +47,7 @@ static void gen(struct ast* t) {
         printf("\n\t");
       break;
       case P_WHILE_T:
-        printf("jmp .L%03d:\n\t", labelcount + 2);
+        printf("jmp .L%03d\n\t", labelcount + 2);
         printf("\r.L%03d:\n\t", ++labelcount);
         gen(t->middle);
         printf("\r.L%03d:\n\t", ++labelcount);
