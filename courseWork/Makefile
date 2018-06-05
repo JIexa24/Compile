@@ -34,6 +34,8 @@ PARSER: ./src/parser.y
 	$(CC) -c ./src/parser.tab.c -o ./obj/parser.tab.o $(CFLAGS)
 	mv ./src/parser.tab.h ./include/parser.tab.h
 
+TEST:
+
 clean:
 	rm -f ./obj/*.o
 	rm -f ./src/lexer.yy.c

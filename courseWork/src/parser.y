@@ -18,7 +18,7 @@
   struct ast* ast_tree;
 }
 
-%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN
+%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN MAIN
 %token <str> TYPEVAR
 %token <str> INUM DNUM
 %token <str> ASSIGN
@@ -27,11 +27,11 @@
 %type <str> CONST
 %type <ast_tree> EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
 %type <ast_tree> IFF IN OUT ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0
-
+%type <ast_tree> FUNC
 
 %%
 
-PROG: START {
+PROG: FUNC {
   if (errcount > 0)
     yyerror("Err~");
   else {
@@ -41,6 +41,8 @@ PROG: START {
     hashtab_print(hashtab);
   }
 };
+
+FUNC: TYPEVAR MAIN LB RB LF START RF {$$ = $6;}
 
 START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
        | STATE {$$ = $1;};
@@ -76,12 +78,12 @@ IFF: IF LB COND RB LF BODY RF {
   $$ = ast_createNode(P_IF_T, $1, $3, $5, $8);
 }
 
-OUT: PRINT VAR SEMCOL {
-  $$ = ast_createNode(P_OUT_T, $1, $2, NULL, NULL);
+OUT: PRINT LB VAR RB SEMCOL {
+  $$ = ast_createNode(P_OUT_T, $1, $3, NULL, NULL);
 };
 
-IN: SCAN ID_TOK1 SEMCOL {
-  $$ = ast_createNode(P_IN_T, $1, $2, NULL, NULL);
+IN: SCAN LB ID_TOK1 RB SEMCOL {
+  $$ = ast_createNode(P_IN_T, $1, $3, NULL, NULL);
 };
 
 /*int v = 5 + b;*/
@@ -98,18 +100,18 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
 };
 
 EXPR: EXPR0 {$$ = $1;}
-      | EXPR0 AND EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-      | EXPR0 XOR EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-      | EXPR0 OR EXPR {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
+      | EXPR0 AND EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
+      | EXPR0 XOR EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
+      | EXPR0 OR EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
 
 EXPR0:   EXPR1 {$$ = $1;}
-        | EXPR1 PLUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-        | EXPR1 MINUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
+        | EXPR1 PLUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
+        | EXPR1 MINUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
 
 EXPR1:  EXPR2 {$$ = $1;}
-        | EXPR2 MUL EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-        | EXPR2 DIV EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);}
-        | EXPR2 MOD EXPR1 {$$ = ast_createNode(P_OP_T, $2, $1, $3, NULL);};
+        | EXPR2 MUL EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
+        | EXPR2 DIV EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
+        | EXPR2 MOD EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
 
 EXPR2:  VAR {$$ = $1;}
         | LB EXPR RB {$$ = $2;}

@@ -6,6 +6,7 @@
 #include <string.h>
 #include "./../include/hash.h"
 #include "./../include/parser.tab.h"
+extern struct listnode* hashtab[];
 extern void yyerror (char *);
 
 int ch;
@@ -27,6 +28,12 @@ SIGN [-+]
 <COMM>"*/" { ch += yyleng; BEGIN INITIAL; }
 <COMM><<EOF>> { ch += yyleng; yyerror("Unterminated comment"); BEGIN INITIAL; }
 \/\/(.)*(\n|$) { ch += yyleng; }
+
+"main" {
+  hashtab_add(hashtab, "main", 256);
+  yylval.str = strdup(yytext);
+  return MAIN;
+}
 
 ";" {
   yylval.str = strdup(yytext);

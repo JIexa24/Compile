@@ -10,11 +10,11 @@ void hashtab_init(struct listnode **hashtab) {
 unsigned int hashtab_hash(char *key) {
   unsigned int h = 0;
   char *p = key;
-  for (p = key; *p != '\0'; p++)
-    h = h * HASHTAB_MUL + (unsigned int)(*p);
-
   int len = strlen(key);
   int hash, i;
+  
+  for (p = key; *p != '\0'; p++)
+    h = h * HASHTAB_MUL + (unsigned int)(*p);
 
   for(hash = i = 0; i < len; ++i) {
       hash += p[i];
