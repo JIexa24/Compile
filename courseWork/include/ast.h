@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct ast {
   int type;
@@ -11,6 +12,8 @@ struct ast {
   struct ast* middle;
   struct ast* right;
 };
+
+#define SIZE_BUFFER 256
 #define DEBUG 0
 
 #define P_NODE_T 255

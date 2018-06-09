@@ -14,6 +14,8 @@ struct listnode
   char *key;
   int value;
   int type;
+  int scan;
+  int num;
   struct listnode *next;
 };
 

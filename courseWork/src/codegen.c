@@ -10,9 +10,12 @@ static int labelcount = 0;
 static int exprLoad = 0;
 static int stackOffset = 0;
 
+static void optimize(struct ast* t);
+
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
 static void genCond(struct ast* t, int inv, int label);
+static int swriteInt(char* buff, int num, int radix, int znac);
 
 int codeGen(struct ast* t) {
   stackOffset = var_counter * 4 + 8;
@@ -30,6 +33,7 @@ int codeGen(struct ast* t) {
   fprintf(fileout, "subq $%d, %%rsp\n\t", stackOffset);
 //------------------------------
   /*generate*/
+  optimize(t);print_ast(t, 0);
   gen(t);
 //------------------------------
   fprintf(fileout, "\n");
@@ -227,9 +231,9 @@ static void genExpr(struct ast* t) {
           case '~':
             tmp = hashtab_lookup(hashtab, t->left->key);
             if (tmp != NULL)
-              fprintf(fileout, "notl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
+              fprintf(fileout, "notl %d(%%rbp)\n\t", -4*(tmp->value) - 4);
             else
-              fprintf(fileout, "notl $%s, %%eax\n\t", t->left->key);
+              fprintf(fileout, "notl %%eax\n\t");
           break;
         }
       break;
@@ -237,4 +241,108 @@ static void genExpr(struct ast* t) {
     }
 
   }
+}
+
+static void optimize(struct ast* t) {
+  int tmp1, tmp2, res;
+  char buffer[256];
+  if (t != NULL) {
+    optimize(t->left);
+    optimize(t->middle);
+    if (t->type == P_OP_T) {
+      if (t->middle != NULL) {
+        if (t->left->type == P_CONST_T && t->middle->type == P_CONST_T) {
+          tmp1 = atoi(t->left->key);
+          tmp2 = atoi(t->middle->key);
+
+          switch(t->key[0]) {
+            case '+':
+              res = tmp1 + tmp2;
+            break;
+            case '-':
+              res = tmp1 - tmp2;
+            break;
+            case '*':
+              res = tmp1 * tmp2;
+            break;
+            case '/':
+            case '%':
+              res = tmp1 / tmp2;
+            break;
+            case '&':
+              res = tmp1 & tmp2;
+            break;
+            case '|':
+              res = tmp1 | tmp2;
+            break;
+            case '^':
+              res = tmp1 ^ tmp2;
+            break;
+          }
+          swriteInt(buffer, res, 10, -1);
+          free(t->key);
+          t->key = strdup(buffer);
+          t->type = P_CONST_T;
+          free(t->left);
+          free(t->middle);
+          t->left = NULL;
+          t->middle = NULL;
+        }
+      }
+    }
+  }
+}
+
+static int swriteInt(char* buff, int num, int radix, int znac)
+{
+  char sign                = '-';
+  int i                    = 0;
+  int j                    = 0;
+  int k                    = 0;
+  char buffer[SIZE_BUFFER] = {0};
+  int counter              = SIZE_BUFFER;
+
+
+  if (num == 0) {
+    if (znac == -1)
+      buff[i] = '0';
+    for (i = 0; i < znac; i++)
+      buff[i] = '0';
+    return i;
+  }
+
+  if (radix == 10) {
+    if (num < 0) {
+      buff[0] = sign;
+      num = -num;
+    }
+  }
+
+  while (num) {
+    if (num % radix > 9) {
+      buffer[--counter] = 'A' + num % radix - 10;
+      num /= radix;
+    } else {
+      buffer[--counter] = '0' + (num % radix);
+      num /= radix;
+    }
+  }
+  if (znac > -1) {
+    if ((SIZE_BUFFER - counter) < znac) {
+      znac = znac - SIZE_BUFFER + counter;
+      while (znac) {
+        buff[i] = '0';
+        i++;
+        j++;
+        znac--;
+      }
+    }
+  }
+
+  while(i < SIZE_BUFFER - counter + j) {
+    buff[i] = buffer[counter + k++];
+    i++;
+  }
+  buff[i] = '\0';
+  return counter;
 }

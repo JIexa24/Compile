@@ -6,11 +6,8 @@ int d;
 
 read(d);
 
-a := a + d * c;
+a := 3 + 4 * 5;
 
-while (a < 20) {
-  a := a + 1;
-}
 
 write(a);
 write(b);

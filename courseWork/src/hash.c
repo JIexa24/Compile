@@ -12,7 +12,7 @@ unsigned int hashtab_hash(char *key) {
   char *p = key;
   int len = strlen(key);
   int hash, i;
-  
+
   for (p = key; *p != '\0'; p++)
     h = h * HASHTAB_MUL + (unsigned int)(*p);
 
@@ -38,6 +38,8 @@ void hashtab_add(struct listnode **hashtab, char *key, int value) {
       node->key = strdup(key);
       node->value = value;
       node->type = -1;
+      node->scan = 0;
+      node->num = 0;
       node->next = NULL;
       hashtab[index] = node;
     }
@@ -48,6 +50,8 @@ void hashtab_add(struct listnode **hashtab, char *key, int value) {
       node->key = strdup(key);
       node->value = value;
       node->type = -1;
+      node->scan = 0;
+      node->num = 0;
       node->next = look;
       hashtab[index] = node;
 	  }

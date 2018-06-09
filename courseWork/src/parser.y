@@ -83,6 +83,9 @@ OUT: PRINT LB VAR RB SEMCOL {
 };
 
 IN: SCAN LB ID_TOK1 RB SEMCOL {
+  struct ast* tmpast = $3;
+  struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
+  tmphash->scan = 1;
   $$ = ast_createNode(P_IN_T, $1, $3, NULL, NULL);
 };
 
@@ -91,6 +94,9 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
   struct ast* tmpast = $2;
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
   tmphash->type = !strcmp($1, "int") ? 0 : 1;
+  if (tmpast->type == P_CONST_T) {
+    tmphash->num = atoi(tmpast->key);
+  }
   $$ = ast_createNode(P_DEF_T, $1, $4, $2, NULL);
 };
 
