@@ -148,10 +148,10 @@ RET: RETURN CONST SEMCOL {
   $$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);
   return_col++;
 }
-BODY: STATE
-      | STATELIST;
+BODY: STATE {$$ = $1;}
+      | STATELIST {$$ = $1;};
 
-STATELIST: STATE BODY;
+STATELIST: STATE BODY {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);};
 
 WHILELOOP: WHILE LB COND RB LF BODY RF {
   $$ = ast_createNode(P_WHILE_T, $1, $3, $6, NULL);

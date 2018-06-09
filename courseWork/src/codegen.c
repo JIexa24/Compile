@@ -51,8 +51,13 @@ static void gen(struct ast* t) {
     switch (t->type) {
       case P_NODE_T:
       case P_DEF_T:
-      case P_DEF1_T:
         gen(t->left);
+        gen(t->middle);
+        fprintf(fileout, "\n\t");
+      break;
+      case P_DEF1_T:
+        genExpr(t->left);
+        exprLoad = 0;
         gen(t->middle);
         fprintf(fileout, "\n\t");
       break;
