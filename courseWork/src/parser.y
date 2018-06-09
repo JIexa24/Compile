@@ -35,7 +35,7 @@ PROG: FUNC {
   if (errcount > 0)
     yyerror("Err~");
   else {
-    print_ast($1, 0);
+    //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
     hashtab_print(hashtab);

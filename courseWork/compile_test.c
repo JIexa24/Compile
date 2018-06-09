@@ -4,9 +4,11 @@ int b := 3;
 int c := 4;
 int d;
 
+read(b);
+read(c);
 read(d);
 
-a := 3 + 4 * c + b * d;
+a := c * c - 4 * d * b;
 
 
 write(a);

@@ -172,7 +172,6 @@ static void genExpr(struct ast* t) {
   struct listnode* tmp = NULL;
   if (t != NULL) {
     genExpr(t->left);
-    genExpr(t->middle);
     tmp = hashtab_lookup(hashtab, t->key);
     switch (t->type) {
       case P_ID_T:
@@ -194,12 +193,24 @@ static void genExpr(struct ast* t) {
               fprintf(fileout, "addl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
             else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "addl $%s, %%eax\n\t", t->middle->key);
+            else if (t->left->type == P_OP_T && t->middle->type == P_OP_T) {
+              fprintf(fileout, "movl %%eax, %%ecx\n\t");
+              exprLoad = 0;
+              genExpr(t->middle);
+              fprintf(fileout, "addl %%ecx, %%eax\n\t");
+            }
           break;
           case '-':
             if (tmp != NULL)
               fprintf(fileout, "subl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
             else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "subl $%s, %%eax\n\t", t->middle->key);
+            else if (t->left->type == P_OP_T && t->middle->type == P_OP_T) {
+              fprintf(fileout, "movl %%eax, %%ecx\n\t");
+              exprLoad = 0;
+              genExpr(t->middle);
+              fprintf(fileout, "subl %%ecx, %%eax\n\t");
+            }
           break;
           case '*':
             if (tmp != NULL)
