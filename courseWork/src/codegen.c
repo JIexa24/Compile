@@ -144,6 +144,10 @@ static void genCond(struct ast* t, int inv, int label) {
     } else if (tmp1 == NULL && tmp2 != NULL) {
       fprintf(fileout, "cmpl $%s, %d(%%rbp)\n\t", t->left->key,-4*(tmp2->value) - 4);
       invert = 0;
+    } else if (tmp1 != NULL && tmp2 != NULL) {
+      fprintf(fileout, "movl %%eax, %d(%%rbp)\n\t", -4*(tmp1->value) - 4);
+      fprintf(fileout, "cmpl %%eax, %d(%%rbp)\n\t", -4*(tmp2->value) - 4);
+      invert = 1;
     }
     switch (t->key[0]) {
       case '>':
