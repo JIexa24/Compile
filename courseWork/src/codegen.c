@@ -4,6 +4,7 @@
 
 extern struct listnode* hashtab[];
 extern int var_counter;
+extern int optimization;
 extern FILE* fileout;
 
 static int labelcount = 0;
@@ -33,7 +34,10 @@ int codeGen(struct ast* t) {
   fprintf(fileout, "subq $%d, %%rsp\n\t", stackOffset);
 //------------------------------
   /*generate*/
-  optimize(t);print_ast(t, 0);
+  if (optimization == 1) {
+    optimize(t);
+  }
+  print_ast(t, 0);
   gen(t);
 //------------------------------
   fprintf(fileout, "\n");
@@ -168,6 +172,7 @@ static void genExpr(struct ast* t) {
   struct listnode* tmp = NULL;
   if (t != NULL) {
     genExpr(t->left);
+    genExpr(t->middle);
     tmp = hashtab_lookup(hashtab, t->key);
     switch (t->type) {
       case P_ID_T:
@@ -187,44 +192,46 @@ static void genExpr(struct ast* t) {
           case '+':
             if (tmp != NULL)
               fprintf(fileout, "addl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "addl $%s, %%eax\n\t", t->middle->key);
           break;
           case '-':
             if (tmp != NULL)
               fprintf(fileout, "subl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "subl $%s, %%eax\n\t", t->middle->key);
           break;
           case '*':
             if (tmp != NULL)
               fprintf(fileout, "mull %d(%%rbp)\n\t", -4*(tmp->value) - 4);
-            else
-              fprintf(fileout, "mull $%s, %%eax\n\t", t->middle->key);
+            else if (t->middle->type == P_CONST_T) {
+              fprintf(fileout, "movl $%s, %%ebx\n\t", t->middle->key);
+              fprintf(fileout, "mull %%ebx\n\t");
+            }
           break;
           case '/':
           case '%':
             if (tmp != NULL)
               fprintf(fileout, "divl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "divl $%s, %%eax\n\t", t->middle->key);
           break;
           case '&':
             if (tmp != NULL)
               fprintf(fileout, "andl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "andl $%s, %%eax\n\t", t->middle->key);
           break;
           case '|':
             if (tmp != NULL)
               fprintf(fileout, "orl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "orl $%s, %%eax\n\t", t->middle->key);
           break;
           case '^':
             if (tmp != NULL)
               fprintf(fileout, "xorl %d(%%rbp), %%eax\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "xorl $%s, %%eax\n\t", t->middle->key);
           break;
           case '!':
@@ -232,7 +239,7 @@ static void genExpr(struct ast* t) {
             tmp = hashtab_lookup(hashtab, t->left->key);
             if (tmp != NULL)
               fprintf(fileout, "notl %d(%%rbp)\n\t", -4*(tmp->value) - 4);
-            else
+            else if (t->middle->type == P_CONST_T)
               fprintf(fileout, "notl %%eax\n\t");
           break;
         }

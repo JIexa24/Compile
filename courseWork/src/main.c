@@ -6,6 +6,7 @@ extern int yylineno;
 extern int ch;
 extern char *yytext;
 extern void yyparse();
+int optimization = 0;
 /*file descriptor in|out*/
 static int fdi = -1;
 static int fdo = -1;
@@ -14,9 +15,10 @@ FILE *fileout;
 
 int main(int argc, char **argv)
 {
-  int i = 0;
   int tmp;
   char outfilename[256];
+  optimization = 0;
+  int i = 0;
   printf("Arguments count: %d\n\n", argc);
   if(argc < 2) {
     printf("Not enough arguments. Please specify filename. \n");
@@ -30,7 +32,11 @@ int main(int argc, char **argv)
       }
       fdo = ++i;
     }
-    if (i != fdo && (i != (fdo - 1))) {
+    if (strcmp("-O", argv[i]) == 0) {
+      printf("Optimization enabled. \n");
+      optimization = 1;
+    }
+    if (i != fdo && (i != (fdo - 1)) && (strcmp(argv[i], "-O") != 0)) {
       fdi = i;
     }
   }
