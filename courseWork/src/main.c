@@ -79,7 +79,7 @@ int main(int argc, char **argv)
       return 1;
     }
   } else {
-    if((fileout = fopen("a.out", "w")) == NULL) {
+    if((fileout = fopen(outfilename, "w")) == NULL) {
       printf("Cannot open file a.out.\n");
       return 1;
     }
