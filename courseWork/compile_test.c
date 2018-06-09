@@ -2,13 +2,10 @@ int main () {
 int a := 10;
 int b := 3;
 int c := 4;
-int d;
+int d := 10;
 
-read(b);
-read(c);
-read(d);
 
-a := c * c - 4 * d * b;
+a := (a + b) * c;
 
 
 write(a);

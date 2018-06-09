@@ -223,6 +223,11 @@ static void genExpr(struct ast* t) {
               exprLoad = 0;
               genExpr(t->middle);
               fprintf(fileout, "mull %%ecx\n\t");
+            } else if ((t->left->type == P_CONST_T || t->left->type == P_ID_T) && t->middle->type == P_OP_T) {
+              fprintf(fileout, "movl %%eax, %%ecx\n\t");
+              exprLoad = 0;
+              genExpr(t->middle);
+              fprintf(fileout, "mull %%ecx\n\t");
             }
           break;
           case '/':
@@ -268,11 +273,13 @@ static void genExpr(struct ast* t) {
 
 static void optimize(struct ast* t) {
   int tmp1, tmp2, res;
-  struct listnode* tmph = NULL;
+  struct listnode* tmph1 = NULL;
+  struct listnode* tmph2 = NULL;
   char buffer[256];
   if (t != NULL) {
     optimize(t->left);
     optimize(t->middle);
+    //print_ast(t, 0);
     if (t->type == P_OP_T) {
       if (t->middle != NULL) {
         if (t->left->type == P_CONST_T && t->middle->type == P_CONST_T) {
@@ -303,19 +310,11 @@ static void optimize(struct ast* t) {
               res = tmp1 ^ tmp2;
             break;
           }
-          swriteInt(buffer, res, 10, -1);
-          free(t->key);
-          t->key = strdup(buffer);
-          t->type = P_CONST_T;
-          free(t->left);
-          free(t->middle);
-          t->left = NULL;
-          t->middle = NULL;
         } else if ((t->left->type == P_ID_T && t->middle->type == P_CONST_T) ||
                    (t->left->type == P_CONST_T && t->middle->type == P_ID_T)) {
-          tmph = hashtab_lookup(hashtab, t->left->type == P_ID_T ? t->left->key : t->middle->key);
-          if (tmph->scan == 1) return;
-          tmp1 = tmph->num;
+          tmph1 = hashtab_lookup(hashtab, t->left->type == P_ID_T ? t->left->key : t->middle->key);
+          if (tmph1->scan == 1) return;
+          tmp1 = tmph1->num;
           tmp2 = atoi(t->left->type == P_ID_T ? t->middle->key : t->left->key);
 
           switch(t->key[0]) {
@@ -342,15 +341,46 @@ static void optimize(struct ast* t) {
               res = tmp1 ^ tmp2;
             break;
           }
-          swriteInt(buffer, res, 10, -1);
-          free(t->key);
-          t->key = strdup(buffer);
-          t->type = P_CONST_T;
-          free(t->left);
-          free(t->middle);
-          t->left = NULL;
-          t->middle = NULL;
+        } else if (t->left->type == P_ID_T && t->middle->type == P_ID_T) {
+          tmph1 = hashtab_lookup(hashtab, t->left->key);
+          if (tmph1->scan == 1) return;
+          tmph2 = hashtab_lookup(hashtab, t->middle->key);
+          if (tmph2->scan == 1) return;
+          tmp1 = tmph1->num;
+          tmp2 = tmph2->num;
+          switch(t->key[0]) {
+            case '+':
+              res = tmp1 + tmp2;
+            break;
+            case '-':
+              res = tmp1 - tmp2;
+            break;
+            case '*':
+              res = tmp1 * tmp2;
+            break;
+            case '/':
+            case '%':
+              res = tmp1 / tmp2;
+            break;
+            case '&':
+              res = tmp1 & tmp2;
+            break;
+            case '|':
+              res = tmp1 | tmp2;
+            break;
+            case '^':
+              res = tmp1 ^ tmp2;
+            break;
+          }
         }
+        swriteInt(buffer, res, 10, -1);
+        free(t->key);
+        t->key = strdup(buffer);
+        t->type = P_CONST_T;
+        free(t->left);
+        free(t->middle);
+        t->left = NULL;
+        t->middle = NULL;
       }
     }
   }
