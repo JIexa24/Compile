@@ -218,6 +218,11 @@ static void genExpr(struct ast* t) {
             else if (t->middle->type == P_CONST_T) {
               fprintf(fileout, "movl $%s, %%ebx\n\t", t->middle->key);
               fprintf(fileout, "mull %%ebx\n\t");
+            } else if (t->left->type == P_OP_T && t->middle->type == P_OP_T) {
+              fprintf(fileout, "movl %%eax, %%ecx\n\t");
+              exprLoad = 0;
+              genExpr(t->middle);
+              fprintf(fileout, "mull %%ecx\n\t");
             }
           break;
           case '/':
