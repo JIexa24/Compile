@@ -94,6 +94,7 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
   struct ast* tmpast = $2;
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
   tmphash->type = !strcmp($1, "int") ? 0 : 1;
+  tmpast = $4;
   if (tmpast->type == P_CONST_T) {
     tmphash->num = atoi(tmpast->key);
   }
@@ -102,6 +103,12 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
 
 /*v = 5 + b;*/
 DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
+  struct ast* tmpast = $1;
+  struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
+  tmpast = $3;
+  if (tmpast->type == P_CONST_T) {
+    tmphash->num = atoi(tmpast->key);
+  }
   $$ = ast_createNode(P_DEF1_T, $2, $3, $1, NULL);
 };
 

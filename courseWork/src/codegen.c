@@ -245,6 +245,7 @@ static void genExpr(struct ast* t) {
 
 static void optimize(struct ast* t) {
   int tmp1, tmp2, res;
+  struct listnode* tmph = NULL;
   char buffer[256];
   if (t != NULL) {
     optimize(t->left);
@@ -254,6 +255,45 @@ static void optimize(struct ast* t) {
         if (t->left->type == P_CONST_T && t->middle->type == P_CONST_T) {
           tmp1 = atoi(t->left->key);
           tmp2 = atoi(t->middle->key);
+
+          switch(t->key[0]) {
+            case '+':
+              res = tmp1 + tmp2;
+            break;
+            case '-':
+              res = tmp1 - tmp2;
+            break;
+            case '*':
+              res = tmp1 * tmp2;
+            break;
+            case '/':
+            case '%':
+              res = tmp1 / tmp2;
+            break;
+            case '&':
+              res = tmp1 & tmp2;
+            break;
+            case '|':
+              res = tmp1 | tmp2;
+            break;
+            case '^':
+              res = tmp1 ^ tmp2;
+            break;
+          }
+          swriteInt(buffer, res, 10, -1);
+          free(t->key);
+          t->key = strdup(buffer);
+          t->type = P_CONST_T;
+          free(t->left);
+          free(t->middle);
+          t->left = NULL;
+          t->middle = NULL;
+        } else if ((t->left->type == P_ID_T && t->middle->type == P_CONST_T) ||
+                   (t->left->type == P_CONST_T && t->middle->type == P_ID_T)) {
+          tmph = hashtab_lookup(hashtab, t->left->type == P_ID_T ? t->left->key : t->middle->key);
+          if (tmph->scan == 1) return;
+          tmp1 = tmph->num;
+          tmp2 = atoi(t->left->type == P_ID_T ? t->middle->key : t->left->key);
 
           switch(t->key[0]) {
             case '+':

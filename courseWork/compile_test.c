@@ -6,7 +6,7 @@ int d;
 
 read(d);
 
-a := 3 + 4 * 5;
+a := 3 + 4 * c + b * 2;
 
 
 write(a);

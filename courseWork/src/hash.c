@@ -86,7 +86,7 @@ void hashtab_print(struct listnode **hashtab) {
   printf("\n\n\t\t\tHASH TABLE:\n\n");
   for (i = 0; i < HASHTAB_SIZE; ++i){
     if (hashtab[i] != NULL) {
-      printf("\tNode #%d:\t%s\t-\t%d\t=%d\n", i + 1, hashtab[i]->key, hashtab[i]->value, hashtab[i]->type);
+      printf("\tNode #%d:\t%s\t-\t%d\t=%d ,scan = %d , num = %d\n", i + 1, hashtab[i]->key, hashtab[i]->value, hashtab[i]->type, hashtab[i]->scan,  hashtab[i]->num);
 
       if (hashtab[i]->next != NULL) {
         printf("\tNote: This Node (#%d) has collision\n", i + 1);
