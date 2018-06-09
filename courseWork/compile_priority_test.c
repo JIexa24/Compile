@@ -8,7 +8,7 @@ int d := 9;
 a := (a + b) * c;
 write(a);
 
-a := a + b * c + c * d;
+a := a + b * c + c * d  + c * a;
 write(a);
 
 write(b);

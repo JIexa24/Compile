@@ -11,6 +11,7 @@
   void yyerror(char *);
   int errcount = 0;
   int var_counter = 0;
+  int return_col = 0;
 %}
 
 %union {
@@ -32,9 +33,12 @@
 %%
 
 PROG: FUNC {
-  if (errcount > 0)
+  if (errcount > 0) {
+    if (return_col == 0) {
+      yyerror("Expected return");
+    }
     yyerror("Err~");
-  else {
+  } else {
     //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
@@ -42,7 +46,8 @@ PROG: FUNC {
   }
 };
 
-FUNC: TYPEVAR MAIN LB RB LF START RF {$$ = $6;}
+FUNC: TYPEVAR MAIN LB RB LF START RET RF {$$ = ast_createNode(P_NODE_T, NULL, $6, $7, NULL);}
+      | TYPEVAR MAIN LB RB LF RET RF {$$ = $6;}
 
 START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
        | STATE {$$ = $1;};
@@ -139,7 +144,10 @@ DEFVAR2: TYPEVAR ID_TOK SEMCOL {
   $$ = ast_createNode(P_DEF2_T, $1, $2, NULL, NULL);
 };
 
-RET: RETURN CONST SEMCOL {$$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);}
+RET: RETURN CONST SEMCOL {
+  $$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);
+  return_col++;
+}
 BODY: STATE
       | STATELIST;
 
