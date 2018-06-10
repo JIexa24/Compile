@@ -7,7 +7,17 @@ int main () {
 
   read(d);
 
-  if (b < d)
-    write(d);
+  if (d < 10)
+    write(a);
+  else
+    write(e);
+
+  if (d == 10) {
+    write(b);
+  }
+
+  if (10 < d)
+    write(c);
+
   return 0;
 }

@@ -5,7 +5,7 @@ int main () {
   int d := 23;
 
 
-  while (1) {
+  while (a < 22) {
     a := a + 1;
   }
   write(a);

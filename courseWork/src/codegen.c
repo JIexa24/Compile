@@ -15,7 +15,7 @@ static void optimize(struct ast* t);
 
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
-static void genCond(struct ast* t, int inv, int label);
+static void genCond(struct ast* t, int inv, int els, int label);
 static int swriteInt(char* buff, int num, int radix, int znac);
 
 int codeGen(struct ast* t) {
@@ -66,15 +66,15 @@ static void gen(struct ast* t) {
         fprintf(fileout, "\r.L%03d:\n\t", ++labelcount);
         gen(t->middle);
         fprintf(fileout, "\r.L%03d:\n\t", ++labelcount);
-        genCond(t->left, 1, labelcount - 1);
+        genCond(t->left, 1, 0, labelcount - 1);
         fprintf(fileout, "\n\t");
       break;
       case P_IF_T:
-        genCond(t->left, 0, labelcount + 1);
+        genCond(t->left, 0, 0, labelcount + 1);
         gen(t->middle);
         fprintf(fileout, "\r.L%03d:\n\t", ++labelcount);
         if (t->right != NULL) {
-          genCond(t->left, 1, labelcount + 1);
+          genCond(t->left, 0, 1, labelcount + 1);
           gen(t->right);
           fprintf(fileout, "\r.L%03d:\n\t", ++labelcount);
         }
@@ -138,7 +138,7 @@ static void gen(struct ast* t) {
   }
 }
 
-static void genCond(struct ast* t, int inv, int label) {
+static void genCond(struct ast* t, int inv, int els, int label) {
   struct listnode* tmp1 = NULL;
   struct listnode* tmp2 = NULL;
   if (t != NULL) {
@@ -147,13 +147,13 @@ static void genCond(struct ast* t, int inv, int label) {
     if (tmp1 != NULL && tmp2 == NULL) {
       fprintf(fileout, "cmpl $%s, %d(%%rbp)\n\t", t->middle->key,-4*(tmp1->value) - 4);
     } else if (tmp1 == NULL && tmp2 != NULL) {
-      fprintf(fileout, "xorl %%edx, %%edx\n\t"); 
+      fprintf(fileout, "xorl %%edx, %%edx\n\t");
       fprintf(fileout, "movl $%s, %%edx\n\t", t->left->key);
       fprintf(fileout, "cmpl %d(%%rbp), %%edx\n\t", -4*(tmp2->value) - 4);
     } else if (tmp1 != NULL && tmp2 != NULL) {
       fprintf(fileout, "xorl %%edx, %%edx\n\t");
-      fprintf(fileout, "movl %%edx, %d(%%rbp)\n\t", -4*(tmp1->value) - 4);
-      fprintf(fileout, "cmpl %%edx, %d(%%rbp)\n\t", -4*(tmp2->value) - 4);
+      fprintf(fileout, "movl %%edx, %d(%%rbp)\n\t", -4*(tmp2->value) - 4);
+      fprintf(fileout, "cmpl %%edx, %d(%%rbp)\n\t", -4*(tmp1->value) - 4);
     } else if (tmp1 == NULL && tmp2 == NULL) {
       fprintf(fileout, "xorl %%edx, %%edx\n\t");
       fprintf(fileout, "movl $%s, %%edx\n\t", t->left->key);
@@ -162,24 +162,36 @@ static void genCond(struct ast* t, int inv, int label) {
     switch (t->key[0]) {
       case '>':
         if (inv == 0)
-          fprintf(fileout, "jle .L%03d\n\t", label);
-        else
+          if (els == 0)
+            fprintf(fileout, "jle .L%03d\n\t", label);
+          else {
+            fprintf(fileout, "jg .L%03d\n\t", label);
+          }
+        else {
           fprintf(fileout, "jg .L%03d\n\t", label);
+        }
       break;
       case '<':
         if (inv == 0) {
-          fprintf(fileout, "jg .L%03d\n\t", label);
-          fprintf(fileout, "je .L%03d\n\t", label);
+          if (els == 0)
+            fprintf(fileout, "jns .L%03d\n\t", label);
+          else {
+            fprintf(fileout, "js .L%03d\n\t", label);
+          }
         } else {
-          fprintf(fileout, "jle .L%03d\n\t", label);
-          fprintf(fileout, "je .L%03d\n\t", label);
+          fprintf(fileout, "js .L%03d\n\t", label);
         }
         break;
       case '=':
         if (inv == 0)
-          fprintf(fileout, "jne .L%03d\n\t", label);
-        else
+          if (els == 0)
+            fprintf(fileout, "jne .L%03d\n\t", label);
+          else {
+            fprintf(fileout, "je .L%03d\n\t", label);
+          }
+        else {
           fprintf(fileout, "je .L%03d\n\t", label);
+        }
       break;
     }
     fprintf(fileout, "xorl %%edx, %%edx\n\t");
