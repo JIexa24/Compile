@@ -160,7 +160,9 @@ WHILELOOP: WHILE LB COND RB LF BODY RF {
   $$ = ast_createNode(P_WHILE_T, $1, $3, $5, NULL);
 };
 
-COND:  VAR {$$ = $1;}
+COND:  VAR {
+  struct ast* tmpast = ast_createNode(P_CONST_T, strdup("1"), NULL, NULL, NULL);
+  $$ = ast_createNode(P_COND_T, strdup("=="), $1, tmpast, NULL);}
        | VAR LOW VAR {
   $$ = ast_createNode(P_COND_T, $2, $1, $3, NULL);
 }
