@@ -103,7 +103,7 @@ static void gen(struct ast* t) {
       case P_RET_T:
           fprintf(fileout, "addq $%d, %%rsp\n\t", stackOffset);
           if (t->left == NULL)
-          fprintf(fileout, "movl $1, %%eax\n\t", t->key);
+          fprintf(fileout, "movl $1, %%eax\n\t");
           fprintf(fileout, "movl $%s, %%ebx\n\t", t->key);
           fprintf(fileout, "popq %%rbp\n\t");
           fprintf(fileout, "int $0x80\n\t");

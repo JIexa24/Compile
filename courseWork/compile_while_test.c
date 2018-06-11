@@ -7,6 +7,7 @@ int main () {
 
   while (a < 22) {
     a := a + 1;
+   c:= c + 1;
   }
   write(a);
 
