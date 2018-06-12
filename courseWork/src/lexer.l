@@ -30,80 +30,99 @@ SIGN [-+]
 \/\/(.)*(\n|$) { ch += yyleng; }
 
 "main" {
+  ch += yyleng;
   hashtab_add(hashtab, "main", 256);
   yylval.str = strdup(yytext);
   return MAIN;
 }
 
 ";" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return SEMCOL;
 }
 "+" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return PLUS;
 }
 "-" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return MINUS;
 }
 "*" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return MUL;
 }
 "/" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return DIV;
 }
 "%" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return MOD;
 }
 "&" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return AND;
 }
 "|" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return OR;
 }
 "^" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return XOR;
 }
 "!" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return NO;
 }
 "~" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return NOT;
 }
 "(" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return LB;
 }
 ")" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return RB;
 }
 "{" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return LF;
 }
 "}" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return RF;
 }
 "<" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return LOW;
 }
 ">" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return BIG;
 }
 "==" {
+  ch += yyleng;
   yylval.str = strdup(yytext);
   return EQ;
 }
