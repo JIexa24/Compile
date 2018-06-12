@@ -6,6 +6,7 @@
   extern int yylineno;
   extern int ch;
   extern char *yytext;
+  extern int debuginfo;
   extern struct listnode* hashtab[];
   extern int yylex();
   void yyerror(char *);
@@ -42,7 +43,8 @@ PROG: FUNC {
     //print_ast($1, 0);
     codeGen($1);
     free_ast($1);
-    hashtab_print(hashtab);
+    if (debuginfo == 1)
+      hashtab_print(hashtab);
   }
 };
 

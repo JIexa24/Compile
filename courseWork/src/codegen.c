@@ -5,6 +5,7 @@
 extern struct listnode* hashtab[];
 extern int var_counter;
 extern int optimization;
+extern int debuginfo;
 extern FILE* fileout;
 
 static int labelcount = 0;
@@ -37,7 +38,8 @@ int codeGen(struct ast* t) {
   if (optimization == 1) {
     optimize(t);
   }
-  print_ast(t, 0);
+  if (debuginfo == 1)
+    print_ast(t, 0);
   gen(t);
 //------------------------------
   fprintf(fileout, "\n");

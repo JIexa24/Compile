@@ -7,6 +7,7 @@ extern int ch;
 extern char *yytext;
 extern void yyparse();
 int optimization = 0;
+int debuginfo = 0;
 /*file descriptor in|out*/
 static int fdi = -1;
 static int fdo = -1;
@@ -36,7 +37,11 @@ int main(int argc, char **argv)
       printf("Optimization enabled. \n");
       optimization = 1;
     }
-    if (i != fdo && (i != (fdo - 1)) && (strcmp(argv[i], "-O") != 0)) {
+    if (strcmp("-i", argv[i]) == 0) {
+      printf("Debuginfo enabled. \n");
+      debuginfo = 1;
+    }
+    if (i != fdo && (i != (fdo - 1)) && (strcmp(argv[i], "-O") != 0) && (strcmp(argv[i], "-i") != 0)) {
       fdi = i;
     }
   }
