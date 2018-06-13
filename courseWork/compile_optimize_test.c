@@ -4,7 +4,7 @@ int main () {
   int c := 3;
   int d := 4;
   int e;
-    read(a);
+  read(a);
 
   e := a + b * (c - d);
 

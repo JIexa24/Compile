@@ -9,7 +9,6 @@
   extern int debuginfo;
   extern int optimization;
 
-  extern void optimize(struct ast* t);
   extern struct listnode* hashtab[];
   extern int yylex();
   void yyerror(char *);

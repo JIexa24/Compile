@@ -12,8 +12,6 @@ static int labelcount = 0;
 static int exprLoad = 0;
 static int stackOffset = 0;
 
-void optimize(struct ast* t);
-
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
 static void genCond(struct ast* t, int inv, int els, int label);
