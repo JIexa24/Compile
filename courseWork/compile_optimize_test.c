@@ -4,8 +4,9 @@ int main () {
   int c := 3;
   int d := 4;
   int e;
+    read(a);
 
-  e := a + b * (d - c) * a;
+  e := a + b * (c - d);
 
   write(a);
   write(b);

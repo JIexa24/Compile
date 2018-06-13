@@ -7,6 +7,9 @@
   extern int ch;
   extern char *yytext;
   extern int debuginfo;
+  extern int optimization;
+
+  extern void optimize(struct ast* t);
   extern struct listnode* hashtab[];
   extern int yylex();
   void yyerror(char *);
@@ -105,7 +108,10 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
   if (tmpast->type == P_CONST_T) {
     tmphash->num = atoi(tmpast->key);
   }
-  $$ = ast_createNode(P_DEF_T, $1, $4, $2, NULL);
+  if (optimization == 1) {
+    optimize(tmpast);
+  }
+  $$ = ast_createNode(P_DEF_T, $1, tmpast, $2, NULL);
 };
 
 /*v = 5 + b;*/
@@ -116,7 +122,10 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
   if (tmpast->type == P_CONST_T) {
     tmphash->num = atoi(tmpast->key);
   }
-  $$ = ast_createNode(P_DEF1_T, $2, $3, $1, NULL);
+  if (optimization == 1) {
+    optimize(tmpast);
+  }
+  $$ = ast_createNode(P_DEF1_T, $2, tmpast, $1, NULL);
 };
 
 EXPR: EXPR0 {$$ = $1;}

@@ -12,7 +12,7 @@ static int labelcount = 0;
 static int exprLoad = 0;
 static int stackOffset = 0;
 
-static void optimize(struct ast* t);
+void optimize(struct ast* t);
 
 static void gen(struct ast* t);
 static void genExpr(struct ast* t);
@@ -35,9 +35,6 @@ int codeGen(struct ast* t) {
   fprintf(fileout, "subq $%d, %%rsp\n\t", stackOffset);
 //------------------------------
   /*generate*/
-  if (optimization == 1) {
-    optimize(t);
-  }
   if (debuginfo == 1)
     print_ast(t, 0);
   gen(t);
@@ -303,7 +300,7 @@ static void genExpr(struct ast* t) {
   }
 }
 
-static void optimize(struct ast* t) {
+void optimize(struct ast* t) {
   int tmp1, tmp2, res;
   struct listnode* tmph1 = NULL;
   struct listnode* tmph2 = NULL;
