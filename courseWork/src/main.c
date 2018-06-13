@@ -77,6 +77,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  printf("\n");
   printf("File descriptors:\nin: %d\nout: %d\n\n", fdi, fdo);
   printf("File names:\nin: %s\nout: %s\n\n",
         argv[fdi], fdo == -1 ? outfilename : argv[fdo]);
