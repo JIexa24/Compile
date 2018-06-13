@@ -18,8 +18,10 @@ int main(int argc, char **argv)
 {
   int tmp;
   char outfilename[256];
-  optimization = 0;
   int i = 0;
+  optimization = 0;
+  debuginfo = 0;
+
   printf("Arguments count: %d\n\n", argc);
   if(argc < 2) {
     printf("Not enough arguments. Please specify filename. \n");
