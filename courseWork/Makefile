@@ -1,4 +1,5 @@
 CC = gcc
+TCC = ./bin/tlpcc
 LEX = flex
 PARSE = bison
 CFLAGS = -g3 -O0 -Wall
@@ -35,6 +36,14 @@ PARSER: ./src/parser.y
 	mv ./src/parser.tab.h ./include/parser.tab.h
 
 TEST:
+	$(TCC) ./compile_char_test.c -o ./asm/compile_char_test.s
+	$(TCC) ./compile_if_test.c -o ./asm/compile_if_test.s
+	$(TCC) ./compile_while_test.c -o ./asm/compile_while_test.s
+	$(TCC) ./compile_fibo_test.c -o ./asm/compile_fibo_test.s
+	$(TCC) ./compile_priority_test.c -o ./asm/compile_priority_test.s
+	$(TCC) ./compile_optimize_test.c -o ./asm/compile_optimize_test.s -O
+	$(TCC) ./compile_comment_test.c -o ./asm/compile_comment_test.s
+	$(TCC) ./compile_emptyfunc_test.c -o ./asm/compile_emptyfunc_test.s
 
 clean:
 	rm -f ./obj/*.o
