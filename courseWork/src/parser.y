@@ -203,8 +203,23 @@ ID_TOK1: ID {
 VAR:    CONST {
   char *tmp = $1;
   if (tmp[0] == '\''){
+    int n;
     char buf[256];
-    int n = tmp[1] - '\0';
+    if (tmp[1] == '\\'){
+      if (tmp[2] == '0') {
+        n = 0;
+      } else if (tmp[2] == 'n') {
+        n = 10;
+      } else if (tmp[2] == 'r') {
+        n = 13;
+      } else if (tmp[2] == 'a') {
+        n = 7;
+      } else if (tmp[2] == 't') {
+        n = 9;
+      } else n = 0;
+    } else {
+      n = tmp[1] - '\0';
+    }
     swriteInt(buf, n, 10, -1);
     $$ = ast_createNode(P_CONSTC_T, strdup(buf), NULL, NULL, NULL);
   }

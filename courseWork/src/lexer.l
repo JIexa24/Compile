@@ -18,9 +18,11 @@ DIGIT[0-9]
 LETTER[a-zA-Z]
 DELIM[();{},:]
 WS[ \n\t]
+SP[ntabr]
 OPER [-+*/<>|?!%=~]
 SIGN [-+]
 CAW [']
+BCSL [\\]
 %x COMM
 %%
 
@@ -38,7 +40,7 @@ CAW [']
   return MAIN;
 }
 
-{CAW}{LETTER}{CAW} {
+{CAW}.{CAW}|{CAW}{BCSL}{SP}{CAW} {
   ch += yyleng;
   yylval.str = strdup(yytext);
   return CNUM;
