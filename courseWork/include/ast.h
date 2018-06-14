@@ -31,8 +31,10 @@ struct ast {
 #define P_DEF2_T 11
 #define P_IN_T 12
 #define P_IF_T 13
+#define P_CONSTC_T 14
 
 void optimize(struct ast* t);
+int swriteInt(char* buff, int num, int radix, int znac);
 
 struct ast* ast_createNode(int type, char* key, struct ast* l, struct ast* m, struct ast* r);
 void print_ast(struct ast* t, int l);

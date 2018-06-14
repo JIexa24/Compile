@@ -24,7 +24,7 @@
 
 %token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN MAIN
 %token <str> TYPEVAR
-%token <str> INUM DNUM
+%token <str> INUM DNUM CNUM
 %token <str> ASSIGN
 %token <str> CMP
 %token <str> SEMCOL LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
@@ -104,7 +104,7 @@ DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
   tmphash->type = !strcmp($1, "int") ? 0 : 1;
   tmpast = $4;
-  if (tmpast->type == P_CONST_T) {
+  if (tmpast->type == P_CONST_T || tmpast->type == P_CONSTC_T) {
     tmphash->num = atoi(tmpast->key);
   }
   if (optimization == 1) {
@@ -118,7 +118,7 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
   struct ast* tmpast = $1;
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
   tmpast = $3;
-  if (tmpast->type == P_CONST_T) {
+  if (tmpast->type == P_CONST_T || tmpast->type == P_CONSTC_T) {
     tmphash->num = atoi(tmpast->key);
   }
   if (optimization == 1) {
@@ -201,6 +201,14 @@ ID_TOK1: ID {
 };
 
 VAR:    CONST {
+  char *tmp = $1;
+  if (tmp[0] == '\''){
+    char buf[256];
+    int n = tmp[1] - '\0';
+    swriteInt(buf, n, 10, -1);
+    $$ = ast_createNode(P_CONSTC_T, strdup(buf), NULL, NULL, NULL);
+  }
+  else
   $$ = ast_createNode(P_CONST_T, $1, NULL, NULL, NULL);
 }
         | ID_TOK1 {
@@ -208,7 +216,8 @@ VAR:    CONST {
 };
 
 CONST:  INUM
-        | DNUM;
+        | DNUM
+        | CNUM;
 
 %%
 void yyerror(char *errmsg)

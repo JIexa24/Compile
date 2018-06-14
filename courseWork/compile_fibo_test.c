@@ -5,11 +5,12 @@ int main () {
 
 
   while (a < 255) {
+    write(b);
     prev := a;
     a := a + b;
     b := prev;
-    write(b);
   }
 
+  write(b);
   return 0;
 }

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "./../include/hash.h"
+#include "./../include/ast.h"
 #include "./../include/parser.tab.h"
 extern struct listnode* hashtab[];
 extern void yyerror (char *);
@@ -19,6 +20,7 @@ DELIM[();{},:]
 WS[ \n\t]
 OPER [-+*/<>|?!%=~]
 SIGN [-+]
+CAW [']
 %x COMM
 %%
 
@@ -34,6 +36,12 @@ SIGN [-+]
   hashtab_add(hashtab, "main", 256);
   yylval.str = strdup(yytext);
   return MAIN;
+}
+
+{CAW}{LETTER}{CAW} {
+  ch += yyleng;
+  yylval.str = strdup(yytext);
+  return CNUM;
 }
 
 ";" {
@@ -55,16 +63,6 @@ SIGN [-+]
   ch += yyleng;
   yylval.str = strdup(yytext);
   return MUL;
-}
-"/" {
-  ch += yyleng;
-  yylval.str = strdup(yytext);
-  return DIV;
-}
-"%" {
-  ch += yyleng;
-  yylval.str = strdup(yytext);
-  return MOD;
 }
 "&" {
   ch += yyleng;
@@ -142,7 +140,7 @@ SIGN [-+]
   return DNUM;
 }
 
-"int"|"float" {
+"int"|"char" {
 	//printf("KEYWORD_TYPE (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
   yylval.str = strdup(yytext);
@@ -168,13 +166,6 @@ SIGN [-+]
  	ch += yyleng;
   yylval.str = strdup(yytext);
   return IF;
-}
-
-"then" {
-	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
- 	ch += yyleng;
-  yylval.str = strdup(yytext);
-  return THEN;
 }
 
 "else" {
