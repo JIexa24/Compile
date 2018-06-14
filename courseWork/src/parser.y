@@ -118,6 +118,7 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
   struct ast* tmpast = $1;
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
   tmpast = $3;
+  tmphash->scan = 1;
   if (tmpast->type == P_CONST_T || tmpast->type == P_CONSTC_T) {
     tmphash->num = atoi(tmpast->key);
   }

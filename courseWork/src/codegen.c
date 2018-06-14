@@ -430,8 +430,8 @@ void optimize(struct ast* t) {
         free(t->key);
         t->key = strdup(buffer);
         t->type = P_CONST_T;
-        free(t->left);
-        free(t->middle);
+        free_ast(t->left);
+        free_ast(t->middle);
         t->left = NULL;
         t->middle = NULL;
       }
