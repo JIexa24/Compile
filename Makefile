@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -g3 -O0
 LIB = -lm
 
-all: LIST LEXER ./obj/main.o
+all: LIST LEXER COURSE ./obj/main.o
 	$(CC) ./obj/data.o ./obj/lexer.o ./obj/main.o ./obj/list.o -o ./bin/compile $(CFLAGS) $(LIB)
 
 ./obj/main.o: ./src/main.c
@@ -26,5 +26,9 @@ PARSER: ./obj/parser.o
 ./obj/parser.o: ./src/parser.c
 	$(CC) -c ./src/parser.c -o ./obj/parser.o
 
+COURSE:
+	make -C ./courseWork
+
 clean:
 	rm -f ./obj/*.o
+	make clean -C ./courseWork
