@@ -163,6 +163,12 @@ BCSL [\\]
   return WHILE;
 }
 
+"done" {
+  ch += yyleng;
+  yylval.str = strdup(yytext);
+  	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
+}
+
 "if" {
 	//printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;

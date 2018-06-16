@@ -174,7 +174,7 @@ static void genCond(struct ast* t, int inv, int els, int label) {
       fprintf(fileout, "cmpl %d(%%rbp), %%edx\n\t", -4*(tmp2->value) - 4);
     } else if (tmp1 != NULL && tmp2 != NULL) {
       fprintf(fileout, "xorl %%edx, %%edx\n\t");
-      fprintf(fileout, "movl %%edx, %d(%%rbp)\n\t", -4*(tmp2->value) - 4);
+      fprintf(fileout, "movl %d(%%rbp), %%edx\n\t", -4*(tmp2->value) - 4);
       fprintf(fileout, "cmpl %%edx, %d(%%rbp)\n\t", -4*(tmp1->value) - 4);
     } else if (tmp1 == NULL && tmp2 == NULL) {
       fprintf(fileout, "xorl %%edx, %%edx\n\t");

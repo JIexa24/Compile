@@ -15,7 +15,7 @@ main:
 	pushq %rbp
 	movq %rsp, %rbp
 	subq $12, %rsp
-	movl $10, %eax
+	movl $97, %eax
 	andl $65535, %eax
 	andl $255, %eax
 	movl %eax, -4(%rbp)

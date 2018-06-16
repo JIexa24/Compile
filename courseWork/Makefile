@@ -1,5 +1,6 @@
 CC = gcc
 TCC = ./bin/tlpcc
+ASM = as
 LEX = flex
 PARSE = bison
 CFLAGS = -g3 -O0 -Wall
@@ -37,13 +38,28 @@ PARSER: ./src/parser.y
 
 TEST:
 	$(TCC) ./compile_char_test.c -o ./asm/compile_char_test.s
+	$(ASM) ./asm/compile_char_test.s -o ./obj/compile_char_test.o
+
 	$(TCC) ./compile_if_test.c -o ./asm/compile_if_test.s
+	$(ASM) ./asm/compile_if_test.s -o ./obj/compile_if_test.o
+
 	$(TCC) ./compile_while_test.c -o ./asm/compile_while_test.s
+	$(ASM) ./asm/compile_while_test.s -o ./obj/compile_while_test.o
+
 	$(TCC) ./compile_fibo_test.c -o ./asm/compile_fibo_test.s
+	$(ASM) ./asm/compile_fibo_test.s -o ./obj/compile_fibo_test.o
+
 	$(TCC) ./compile_priority_test.c -o ./asm/compile_priority_test.s
+	$(ASM) ./asm/compile_priority_test.s -o ./obj/compile_priority_test.o
+
 	$(TCC) ./compile_optimize_test.c -o ./asm/compile_optimize_test.s -O
+	$(ASM) ./asm/compile_optimize_test.s -o ./obj/compile_optimize_test.o
+
 	$(TCC) ./compile_comment_test.c -o ./asm/compile_comment_test.s
+	$(ASM) ./asm/compile_comment_test.s -o ./obj/compile_comment_test.o
+
 	$(TCC) ./compile_emptyfunc_test.c -o ./asm/compile_emptyfunc_test.s
+	$(ASM) ./asm/compile_emptyfunc_test.s -o ./obj/compile_emptyfunc_test.o
 
 clean:
 	rm -f ./obj/*.o

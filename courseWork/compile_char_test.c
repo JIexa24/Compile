@@ -1,5 +1,5 @@
 int main () {
-  char a := '\n';
+  char a := 'a';
 
   write(a);
   a := a + 2;

@@ -30,8 +30,9 @@ unsigned int hashtab_hash(char *key) {
 void hashtab_add(struct listnode **hashtab, char *key, int value) {
   struct listnode *node;
 	struct listnode *look;
-	look = hashtab_lookup(hashtab, key);
-  int index = hashtab_hash(key);
+  int i, index;
+	/*look = hashtab_lookup(hashtab, key);
+  index = hashtab_hash(key);
   if (look == NULL) {
     node = malloc(sizeof(*node));
     if (node != NULL) {
@@ -55,16 +56,51 @@ void hashtab_add(struct listnode **hashtab, char *key, int value) {
       node->next = look;
       hashtab[index] = node;
 	  }
+  }*/
+  index = hashtab_hash(key);
+  if (hashtab[index] == NULL) {
+    node = malloc(sizeof(*node));
+    if (node != NULL) {
+      node->key = strdup(key);
+      node->value = value;
+      node->type = -1;
+      node->scan = 0;
+      node->num = 0;
+      node->next = NULL;
+      hashtab[index] = node;
+    }
+  } else {
+    node = malloc(sizeof(*node));
+    if (node != NULL) {
+      node->key = strdup(key);
+      node->value = value;
+      node->type = -1;
+      node->scan = 0;
+      node->num = 0;
+      node->next = NULL;
+    for (i = 0; i < HASHTAB_SIZE; ++i) {
+      if (hashtab[(i + index) % HASHTAB_SIZE] != NULL)
+        hashtab[(i + index) % HASHTAB_SIZE] = node;
+    }
+    if (i == HASHTAB_SIZE) printf("error hash\n" );
+    }
   }
 }
 
 struct listnode *hashtab_lookup(struct listnode **hashtab, char *key) {
-  int index;
+  int index, i;
   struct listnode *node;
   index = hashtab_hash(key);
-  for (node = hashtab[index]; node != NULL; node = node->next)
+
+  /*  for (node = hashtab[index]; node != NULL; node = node->next)
     if (strcmp(node->key, key) == 0)
       return node;
+  return NULL;*/
+  for (i = 0; i  < HASHTAB_SIZE; ++i) {
+    if (hashtab[i] != NULL)
+    if (strcmp(hashtab[i]->key, key) == 0)
+      return hashtab[i];
+  }
   return NULL;
 }
 
