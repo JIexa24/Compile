@@ -6,10 +6,6 @@
 #include <string.h>
 extern void yyerror (char *);
 
-#include "./../include/hash.h"
-#include "./../include/ast.h"
-#include "./../include/parser.tab.h"
-extern struct listnode* hashtab[];
 int ch;
 int value = 10;
 %}
@@ -25,85 +21,54 @@ CAW [']
 BCSL [\\]
 %x COMM
 %%
-{CAW}.{CAW}|{CAW}{BCSL}{SP}{CAW} {
-  ch += yyleng;
-  yylval.str = strdup(yytext);
-  return CNUM;
-}
-
-"(" return LB;
-")" return RB;
-
-";" {
-  ch += yyleng;
-  yylval.str = strdup(yytext);
-  return SEMCOL;
-}
-
-"int"|"char" {
-	//printf("KEYWORD_TYPE (%d, %d): %s\n", yylineno, ch, yytext);
- 	ch += yyleng;
-  yylval.str = strdup(yytext);
-  return TYPEVAR;
-}
 
 "<" {
     printf("DOUBLE NUM (%d, %d): %s\n", yylineno, ch, yytext);
   ch += yyleng;
-  yylval.str = strdup(yytext);
-return LOW;
 
 }
 ">" {
   ch += yyleng;
-  yylval.str = strdup(yytext);
     printf("DOUBLE NUM (%d, %d): %s\n", yylineno, ch, yytext);
-  return BIG;
 }
 
 
 
 {SIGN}?({DIGIT}+\.{DIGIT}+|{DIGIT}+\.|{DIGIT}+)([eE]{SIGN}?{DIGIT}+)? {
   ch += yyleng;
-  yylval.str = strdup(yytext);
   printf("DOUBLE NUM (%d, %d): %s\n", yylineno, ch, yytext);
-  return DNUM;
+  //return DNUM;
 }
 
 "done" {
   ch += yyleng;
-  yylval.str = strdup(yytext);
   	printf("KEYWORD (%d, %d): %s\n", yylineno, ch, yytext);
-    return DONE;
 }
 
 ":=" {
 	printf("OPERATION (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
-  yylval.str = strdup(yytext);
-  return ASSIGN;
+  //return ASSIGN;
 }
 
 "while" {
 	printf("OPERATION (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
-  yylval.str = strdup(yytext);
- return WHILE;
+
 }
 
 ("_"|{LETTER})("_"|{LETTER}|{DIGIT})* {
 	printf("IDENTIFIER (%d, %d): %s\n", yylineno, ch, yytext);
   //hashtab_add(hashtab, yytext, value*ch);
-  yylval.str = strdup(yytext);
+  //yylval.str = strdup(yytext);
 	ch += yyleng;
-  return ID;
+//  return ID;
 }
 
 "=" {
 	printf("OPERATION (%d, %d): %s\n", yylineno, ch, yytext);
  	ch += yyleng;
-  yylval.str = strdup(yytext);
-  return EQ;
+//  return ROVNO;
 }
 
 
@@ -113,3 +78,31 @@ return LOW;
 }
 
 %%
+
+void yyerror(char *errmsg)
+{
+  fprintf(stderr, "Error: %s (%d, %d): %s\n", errmsg, yylineno, ch, yytext);
+}
+
+int main(int argc, char **argv)
+{
+	if(argc < 2)
+	{
+		printf("\nNot enough arguments. Please specify filename.\n");
+		return -1;
+	}
+	if((yyin = fopen(argv[1], "r")) == NULL)
+	{
+		printf("\nCannot open file %s.\n", argv[1]);
+		return -1;
+	}
+	ch = 1;
+	yylineno = 1;
+
+
+	yylex();
+
+	fclose(yyin);
+
+	return 0;
+}

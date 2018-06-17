@@ -22,36 +22,26 @@
   struct ast* ast_tree;
 }
 
-%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN MAIN
+%token <str> IF THEN ELSE WHILE DO ID RETURN PRINT SCAN MAIN DONE
 %token <str> TYPEVAR
 %token <str> INUM DNUM CNUM
 %token <str> ASSIGN
 %token <str> CMP
 %token <str> SEMCOL LOW BIG EQ PLUS MINUS MUL DIV MOD AND OR XOR LB RB NOT NO LF RF
 %type <str> CONST
-%type <ast_tree> EXPR1 EXPR2 VAR COND WHILELOOP BODY STATE START STATELIST ID_TOK
-%type <ast_tree> IFF IN OUT ID_TOK1 RET PROG DEFVAR DEFVAR1 DEFVAR2 EXPR EXPR0
-%type <ast_tree> FUNC
+%type <ast_tree> VAR COND  STATE START  ID_TOK BODY STATELIST WHILELOOP
+%type <ast_tree> IFF  ID_TOK1 PROG DEFVAR DEFVAR1 DEFVAR2 EXPR
 
 %%
 
-PROG: FUNC {
-  if (errcount > 0) {
-    if (return_col == 0) {
-      yyerror("Expected return");
-    }
-    yyerror("Err~");
-  } else {
-    //print_ast($1, 0);
-    codeGen($1);
-    free_ast($1);
-    if (debuginfo == 1)
+PROG: START {
+    if (debuginfo == 1) {
+    print_ast($1, 0);
       hashtab_print(hashtab);
   }
-};
+  free_ast($1);
 
-FUNC: TYPEVAR MAIN LB RB LF START RET RF {$$ = ast_createNode(P_NODE_T, NULL, $6, $7, NULL);}
-      | TYPEVAR MAIN LB RB LF RET RF {$$ = $6;}
+};
 
 START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
        | STATE {$$ = $1;};
@@ -59,44 +49,19 @@ START: START STATE {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);}
 STATE: error SEMCOL {errcount = errcount + 1;
   yyerror("Some error deteceted~");};
 
-STATE: DEFVAR { $$ = $1;}
+STATE: DEFVAR { $$ = $1; printf("-----");}
        | DEFVAR1 { $$ = $1;}
        | DEFVAR2 { $$ = $1;}
-       | WHILELOOP  { $$ = $1;}
-       | RET { $$ = $1;}
-       | OUT { $$ = $1;}
-       | IN { $$ = $1;}
-       | IFF { $$ = $1;}
+       | WHILELOOP { $$ = $1;}
 
-IFF: IF LB COND RB LF BODY RF {
-  $$ = ast_createNode(P_IF_T, $1, $3, $6, NULL);
-}
-     | IF LB COND RB LF BODY RF ELSE LF BODY RF {
-  $$ = ast_createNode(P_IF_T, $1, $3, $6, $10);
-}
-     | IF LB COND RB LF BODY RF ELSE STATE {
-  $$ = ast_createNode(P_IF_T, $1, $3, $6, $9);
-}
-     | IF LB COND RB STATE {
-  $$ = ast_createNode(P_IF_T, $1, $3, $5, NULL);
-}
-     | IF LB COND RB STATE ELSE STATE {
-  $$ = ast_createNode(P_IF_T, $1, $3, $5, $7);
-}
-     | IF LB COND RB STATE ELSE LF BODY RF {
-  $$ = ast_createNode(P_IF_T, $1, $3, $5, $8);
+WHILELOOP: WHILE COND LB BODY RB DONE SEMCOL {
+  $$ = ast_createNode(P_WHILE_T, $1, $2, $4, NULL);
 }
 
-OUT: PRINT LB VAR RB SEMCOL {
-  $$ = ast_createNode(P_OUT_T, $1, $3, NULL, NULL);
-};
+BODY: STATE {$$ = $1;}
+      | STATELIST {$$ = $1;};
 
-IN: SCAN LB ID_TOK1 RB SEMCOL {
-  struct ast* tmpast = $3;
-  struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
-  tmphash->scan = 1;
-  $$ = ast_createNode(P_IN_T, $1, $3, NULL, NULL);
-};
+STATELIST: STATE BODY {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);};
 
 /*int v = 5 + b;*/
 DEFVAR: TYPEVAR ID_TOK ASSIGN EXPR SEMCOL {
@@ -128,47 +93,14 @@ DEFVAR1: ID_TOK1 ASSIGN EXPR SEMCOL {
   $$ = ast_createNode(P_DEF1_T, $2, tmpast, $1, NULL);
 };
 
-EXPR: EXPR0 {$$ = $1;}
-      | EXPR0 AND EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
-      | EXPR0 XOR EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
-      | EXPR0 OR EXPR {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
-
-EXPR0:   EXPR1 {$$ = $1;}
-        | EXPR1 PLUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
-        | EXPR1 MINUS EXPR0 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
-
-EXPR1:  EXPR2 {$$ = $1;}
-        | EXPR2 MUL EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
-        | EXPR2 DIV EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);}
-        | EXPR2 MOD EXPR1 {$$ = ast_createNode(P_OP_T, $2, $3, $1, NULL);};
-
-EXPR2:  VAR {$$ = $1;}
-        | LB EXPR RB {$$ = $2;}
-        | NOT EXPR {$$ = ast_createNode(P_OP_T, $1, $2, NULL, NULL);}
-        | NO EXPR {$$ = ast_createNode(P_OP_T, $1, $2, NULL, NULL);};
+EXPR: VAR {$$ = $1;}
 
 /*int v;*/
 DEFVAR2: TYPEVAR ID_TOK SEMCOL {
   struct ast* tmpast = $2;
   struct listnode* tmphash = hashtab_lookup(hashtab, tmpast->key);
-  tmphash->type = !strcmp($1, "int") ? 0 : 1;
+  tmphash->type = !strcmp($1, "int") ? 0 : (!strcmp($1, "char") ? 1 : 2);
   $$ = ast_createNode(P_DEF2_T, $1, $2, NULL, NULL);
-};
-
-RET: RETURN CONST SEMCOL {
-  $$ = ast_createNode(P_RET_T, $2, NULL, NULL, NULL);
-  return_col++;
-}
-BODY: STATE {$$ = $1;}
-      | STATELIST {$$ = $1;};
-
-STATELIST: STATE BODY {$$ = ast_createNode(P_NODE_T, NULL, $1, $2, NULL);};
-
-WHILELOOP: WHILE LB COND RB LF BODY RF {
-  $$ = ast_createNode(P_WHILE_T, $1, $3, $6, NULL);
-}
-           | WHILE LB COND RB STATE {
-  $$ = ast_createNode(P_WHILE_T, $1, $3, $5, NULL);
 };
 
 COND:  VAR {
