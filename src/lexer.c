@@ -84,6 +84,7 @@ int lexer_next_token() {
   int expradix = 0;
   int type = L_NONE_T;
   char signexp = '+';
+  char signe = 0;
   char tmp = '\0';
   char* identifier = (char*)malloc(buffer_size * sizeof(char));
 
@@ -93,6 +94,9 @@ int lexer_next_token() {
     i = -1;
     j = 0;
     expform = 0;
+    expradix = 0;
+    signexp = '+';
+    signe = 0;
     position_ident = 0;
     identifier[position_ident] = '\0';
     value = 0;
@@ -100,25 +104,28 @@ int lexer_next_token() {
     if (ch == '\0' || ch == EOF/*EOF*/) {
       type = L_EOF_T;
       break;
-    } else if (is_delim(&ch)) {
+    } else if (is_delim(&ch) && type == L_NONE_T) {
       if (get_ch() == 0) type = L_EOF_T;
       continue;
-    } else if (is_digit(&ch)) {
+    } else if (is_digit(&ch) && type == L_NONE_T) {
       while (is_digit(&ch) || ch == 'E' || ch =='e' || ch == '-' || ch == '+') {
-        identifier[position_ident++] = ch;
-        if (ch == 'E' || ch =='e'){
+        if ((ch == '+' || ch == '-') && expform == 0) {break;}
+          identifier[position_ident++] = ch;
+        if ((ch == 'E' || ch =='e') && expform == 0){ 
           expform = 1;
           get_ch();
           continue;
         }
         if (expform == 0) {
           value = value * 10 + (ch - '0');
-        } else {
-          if (ch == '-' || ch == '+') {
+        } else if (expform == 1) {
+          if (ch == '-' || ch == '+' && signe == 0) {
+            expform = 2;
+            signe = 1;
             signexp = ch;
-          } else {
-            expradix = expradix * 10 + (ch - '0');
           }
+        } else if (expform == 2) {
+          expradix = expradix * 10 + (ch - '0');
         }
         get_ch();
       }
@@ -126,7 +133,7 @@ int lexer_next_token() {
       identifier[position_ident] = '\0';
       value = value * pow(10, expradix);
       type = L_NUM_T;
-    } else if (is_char(&ch)) {
+    } else if (is_char(&ch) && type == L_NONE_T) {
       while (is_char(&ch) || is_digit(&ch)) {
         identifier[position_ident++] = ch;
         get_ch();
@@ -138,7 +145,7 @@ int lexer_next_token() {
       } else {
         type = L_IDENT_T;
       }
-    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_delim(&ch) == 0)) {
+    } else if ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_delim(&ch) == 0) && type == L_NONE_T) {
       position_ident = 0;
       while ((is_char(&ch) == 0) && (is_digit(&ch) == 0) && (is_delim(&ch) == 0)) {
         identifier[position_ident++] = ch;
@@ -204,9 +211,10 @@ int lexer_next_token() {
     }
 
     if (ch != '\n') {
-    //      fprintf(stdout, "[ch : %c]\n", ch);
+    //  fprintf(stdout, "[ch : %c]\n", ch);
+    //  fprintf(stdout, "[s : %d]\n", type);
     } else {
-    //  fprintf(stdout, "[newline]\n");
+    // fprintf(stdout, "[newline]\n");
     }
 
     if (ch != ' ') {
