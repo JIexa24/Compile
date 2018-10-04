@@ -10,7 +10,9 @@ static char error_msg[buffer_size];
 
 static int get_ch() {
 //  scanf("%c", &ch);
-  return read(fd, &ch, 1);
+  int res = read(fd, &ch, 1);
+  ch = (res == 0) ? -1 : ch; 
+  return res;
 }
 
 void open_fd(char* filename) {
