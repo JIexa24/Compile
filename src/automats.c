@@ -421,49 +421,49 @@ int main (int argc, char** argv) {
   else if (a == 4) goto AU4;
   else if (a == 5) goto AU5;
   else if (a == 6) goto AU6;
-  else goto AUE;
+  else goto AU_E;
   AU1:
   if (automat_1() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
+  goto AU_E;
   AU2:
   if (automat_2() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
+  goto AU_E;
   AU3:
   if (automat_3() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
+  goto AU_E;
   AU4:
   if (automat_4() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
+  goto AU_E;
   AU5:
   if (automat_5() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
+  goto AU_E;
   AU6:
   if (automat_6() == 0) {
   	printf("true\n");
   } else {
   	printf("false\n");
   }
-  goto AUE;
-  AUE:
+  goto AU_E;
+  AU_E:
   return 0;
 }
