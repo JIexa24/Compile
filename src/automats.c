@@ -182,7 +182,7 @@ int automat_3_read() {
   char a_3_ch = ch;
   int a_3_result = 0;
   while(r_ch()) {
-    if (ch < a_3_ch) {
+    if (ch < a_3_ch && 'a' <= ch && ch <= 'z') {
       a_3_result = 1;
     }
     a_3_ch = ch;
